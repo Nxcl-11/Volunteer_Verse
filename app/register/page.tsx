@@ -225,7 +225,7 @@ export default function RegisterPage() {
               <TabsList className="grid w-full grid-cols-2 mb-8">
                 <TabsTrigger 
                   value="volunteer" 
-                  className="flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+                  className="cursor-pointer flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -234,7 +234,7 @@ export default function RegisterPage() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="organizer" 
-                  className="flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+                  className="cursor-pointer flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -422,7 +422,7 @@ export default function RegisterPage() {
                         value={organizerData.password}
                         onChange={(e) => handleOrganizerChange('password', e.target.value)}
                         required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:border-green-500 hover:border-gray-400"
+                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500  hover:border-gray-400"
                       />
                     </div>
                     <div className="space-y-2">

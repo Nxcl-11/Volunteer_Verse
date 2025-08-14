@@ -246,11 +246,13 @@ export default function HomePage() {
             </div>
           </div>
 
-          <Button 
-            className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 border-0"
-          >
-            Become one of Us now
-          </Button>
+          <Link href="/register">
+            <Button 
+              className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 border-0"
+            >
+              Become one of Us now
+            </Button>
+          </Link>
         </div>
       </main>
 
