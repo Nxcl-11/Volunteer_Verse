@@ -50,7 +50,7 @@ export default function VolunteerPage() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="" className="flex items-center gap-3">
             <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
               <img 
                 src="/SL-091823-63290-21.jpg" 
