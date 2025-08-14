@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import Link from "next/link"
 import {
   Search,
   Settings,
@@ -90,12 +91,16 @@ export default function VolunteerDashboard() {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
+                <img 
+                  src="/SL-091823-63290-21.jpg" 
+                  alt="VolunteerVerse Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="font-bold text-lg">VOLUNTEERVERSE</span>
-            </div>
+            </Link>
 
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon">
@@ -116,10 +121,14 @@ export default function VolunteerDashboard() {
                   <div className="font-medium">Chylong Nou</div>
                   <div className="text-gray-500">Organizer</div>
                 </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                >
+                  Logout
+                </Button>
               </div>
-              <Button variant="ghost" size="icon">
-                <div className="w-5 h-5 border border-gray-400 rounded"></div>
-              </Button>
             </div>
           </div>
         </header>
@@ -183,7 +192,6 @@ export default function VolunteerDashboard() {
             />
           </div>
 
-          {/* Content based on active tab */}
           {activeTab === "overview" && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {filteredOpportunities.map((opportunity) => (

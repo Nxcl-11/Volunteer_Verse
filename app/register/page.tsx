@@ -1,356 +1,518 @@
 "use client"
-import { useState } from "react"
-import {
-  Search,
-  Settings,
-  Bell,
-  Plus,
-  MapPin,
-  Clock,
-  Calendar,
-  Users,
-  Info,
-  Edit,
-  Trash2
-} from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-// Centralized icon constants
-const ICONS = {
-  search: Search,
-  settings: Settings,
-  bell: Bell,
-  plus: Plus,
-  mapPin: MapPin,
-  clock: Clock,
-  calendar: Calendar,
-  users: Users,
-  info: Info,
-  edit: Edit,
-  trash: Trash2,
-} as const
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useToast } from '@/hooks/use-toast'
 
-// Mock data
-const opportunities = [
-  {
-    id: 1,
-    title: "Esports Volunteer",
-    description: "Help organize the Counter Strike 2 tournament",
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Phnom Penh",
-    duration: "3 Days",
-    date: "11/07/2025",
-    totalVolunteers: 20,
-    maxVolunteers: 30,
-    types: ["Teamwork", "CS2 player"],
-  },
-  {
-    id: 2,
-    title: "Hospital Event Volunteer",
-    description: "Help organize and raise fund to help hospital",
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Phnom Penh",
-    duration: "3 Days",
-    date: "11/9/2025",
-    totalVolunteers: 127,
-    maxVolunteers: 150,
-    types: ["Teamwork", "Community"],
-  },
-]
+interface VolunteerFormData {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  confirmPassword: string
+  phone: string
+  skills: string
+  interests: string
+  availability: string
+}
 
-const applications = [
-  {
-    id: 1,
-    firstName: "Chylong",
-    lastName: "Nou",
-    sex: "M",
-    email: "nou.chylong24@kit.edu.kh",
-    country: "Cambodia",
-    phone: "099788525",
-    volunteerEvent: "Esports Volunteer",
-  },
-]
+interface OrganizerFormData {
+  organizationName: string
+  contactPerson: string
+  email: string
+  password: string
+  confirmPassword: string
+  phone: string
+  organizationType: string
+  website: string
+  description: string
+}
 
-export default function VolunteerDashboard() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [searchQuery, setSearchQuery] = useState("")
+export default function RegisterPage() {
+  const [activeTab, setActiveTab] = useState('volunteer')
+  const [volunteerData, setVolunteerData] = useState<VolunteerFormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    skills: '',
+    interests: '',
+    availability: ''
+  })
+  
+  const [organizerData, setOrganizerData] = useState<OrganizerFormData>({
+    organizationName: '',
+    contactPerson: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    organizationType: '',
+    website: '',
+    description: ''
+  })
 
-  const filteredOpportunities = opportunities.filter(
-      (opp) =>
-          (opp.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-          (opp.description?.toLowerCase() || '').includes(searchQuery.toLowerCase()),
-  )
+  const { toast } = useToast()
+
+  const handleVolunteerChange = (field: keyof VolunteerFormData, value: string) => {
+    setVolunteerData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleOrganizerChange = (field: keyof OrganizerFormData, value: string) => {
+    setOrganizerData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const validateVolunteerForm = (): boolean => {
+    if (!volunteerData.firstName || !volunteerData.lastName || !volunteerData.email || 
+        !volunteerData.password || !volunteerData.confirmPassword || !volunteerData.phone) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    if (volunteerData.password !== volunteerData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    if (volunteerData.password.length < 8) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    return true
+  }
+
+  const validateOrganizerForm = (): boolean => {
+    if (!organizerData.organizationName || !organizerData.contactPerson || !organizerData.email || 
+        !organizerData.password || !organizerData.confirmPassword || !organizerData.phone) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    if (organizerData.password !== organizerData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    if (organizerData.password.length < 8) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive"
+      })
+      return false
+    }
+
+    return true
+  }
+
+  const handleVolunteerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateVolunteerForm()) return
+
+    try {
+      // Here you would typically make an API call to register the volunteer
+      console.log('Volunteer registration data:', volunteerData)
+      
+      toast({
+        title: "Registration Successful!",
+        description: "Welcome to Volunteer Verse! Please check your email to verify your account.",
+      })
+
+      // Reset form
+      setVolunteerData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        phone: '',
+        skills: '',
+        interests: '',
+        availability: ''
+      })
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleOrganizerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateOrganizerForm()) return
+
+    try {
+      // Here you would typically make an API call to register the organizer
+      console.log('Organizer registration data:', organizerData)
+      
+      toast({
+        title: "Registration Successful!",
+        description: "Welcome to Volunteer Verse! Please check your email to verify your account.",
+      })
+
+      // Reset form
+      setOrganizerData({
+        organizationName: '',
+        contactPerson: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        phone: '',
+        organizationType: '',
+        website: '',
+        description: ''
+      })
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
 
   return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
-              <span className="font-bold text-lg">VOLUNTEERVERSE</span>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Join Volunteer Verse
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Choose your role and start making a difference in your community
+          </p>
+        </div>
 
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon">
-                <ICONS.settings className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="relative">
-                <ICONS.bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                1
-              </span>
-              </Button>
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div className="text-sm">
-                  <div className="font-medium">Chylong Nou</div>
-                  <div className="text-gray-500">Organizer</div>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon">
-                <div className="w-5 h-5 border border-gray-400 rounded"></div>
-              </Button>
-            </div>
-          </div>
-        </header>
+        <Card className="w-full">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Create Your Account</CardTitle>
+            <CardDescription>
+              Select whether you want to volunteer or organize opportunities
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger 
+                  value="volunteer" 
+                  className="flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Volunteer
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="organizer" 
+                  className="flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  Organizer
+                </TabsTrigger>
+              </TabsList>
 
-        {/* Main Content */}
-        <main className="px-6 py-8">
-          {/* Title and Stats */}
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-bold text-gray-900">Manage your event here</h1>
-            <div className="flex space-x-4">
-              <div className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center space-x-2">
-                <ICONS.users className="h-5 w-5" />
-                <div>
-                  <div className="text-sm opacity-90">Total volunteers</div>
-                  <div className="text-xl font-bold">404</div>
-                </div>
-              </div>
-              <div className="bg-pink-500 text-white px-6 py-3 rounded-lg flex items-center space-x-2">
-                <ICONS.calendar className="h-5 w-5" />
-                <div>
-                  <div className="text-sm opacity-90">Total Opportunities</div>
-                  <div className="text-xl font-bold">3</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex space-x-1 mb-6">
-            <Button
-                variant={activeTab === "overview" ? "default" : "ghost"}
-                onClick={() => setActiveTab("overview")}
-                className="rounded-lg"
-            >
-              Overview
-            </Button>
-            <Button
-                variant={activeTab === "created" ? "default" : "ghost"}
-                onClick={() => setActiveTab("created")}
-                className="rounded-lg"
-            >
-              Created Opportunity
-            </Button>
-            <Button
-                variant={activeTab === "application" ? "default" : "ghost"}
-                onClick={() => setActiveTab("application")}
-                className="rounded-lg"
-            >
-              Application
-            </Button>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative mb-8 max-w-md">
-            <ICONS.search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white"
-            />
-          </div>
-
-          {/* Content based on active tab */}
-          {activeTab === "overview" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {filteredOpportunities.map((opportunity) => (
-                    <div key={opportunity.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                      <img
-                          src={opportunity.image || "/placeholder.svg"}
-                          alt={opportunity.title}
-                          className="w-full h-48 object-cover"
+              <TabsContent value="volunteer" className="space-y-6">
+                <form onSubmit={handleVolunteerSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name *</Label>
+                      <Input
+                        id="firstName"
+                        type="text"
+                        placeholder="Enter your first name"
+                        value={volunteerData.firstName}
+                        onChange={(e) => handleVolunteerChange('firstName', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
                       />
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-2">{opportunity.title}</h3>
-                        <p className="text-gray-600 text-sm mb-4">{opportunity.description}</p>
-
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center text-sm text-gray-500">
-                            <ICONS.mapPin className="h-4 w-4 mr-2" />
-                            {opportunity.location}
-                          </div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <ICONS.calendar className="h-4 w-4 mr-2" />
-                            {opportunity.date}
-                          </div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <ICONS.clock className="h-4 w-4 mr-2" />
-                            {opportunity.duration}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1 mb-4">
-                          <span className="text-sm font-medium">Type</span>
-                          {opportunity.types.map((type, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {type}
-                              </Badge>
-                          ))}
-                        </div>
-                      </div>
                     </div>
-                ))}
-              </div>
-          )}
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name *</Label>
+                      <Input
+                        id="lastName"
+                        type="text"
+                        placeholder="Enter your last name"
+                        value={volunteerData.lastName}
+                        onChange={(e) => handleVolunteerChange('lastName', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                      />
+                    </div>
+                  </div>
 
-          {activeTab === "created" && (
-              <div className="space-y-6">
-                <div className="flex justify-end">
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <ICONS.plus className="h-4 w-4 mr-2" />
-                    New Opportunities
+                  <div className="space-y-2">
+                    <Label htmlFor="volunteerEmail">Email *</Label>
+                    <Input
+                      id="volunteerEmail"
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={volunteerData.email}
+                      onChange={(e) => handleVolunteerChange('email', e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="volunteerPassword">Password *</Label>
+                      <Input
+                        id="volunteerPassword"
+                        type="password"
+                        placeholder="Create a password"
+                        value={volunteerData.password}
+                        onChange={(e) => handleVolunteerChange('password', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={volunteerData.confirmPassword}
+                        onChange={(e) => handleVolunteerChange('confirmPassword', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={volunteerData.phone}
+                      onChange={(e) => handleVolunteerChange('phone', e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="skills">Skills & Experience</Label>
+                    <Input
+                      id="skills"
+                      type="text"
+                      placeholder="e.g., Teaching, Construction, Medical, etc."
+                      value={volunteerData.skills}
+                      onChange={(e) => handleVolunteerChange('skills', e.target.value)}
+                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="interests">Areas of Interest</Label>
+                    <Input
+                      id="interests"
+                      type="text"
+                      placeholder="e.g., Education, Environment, Healthcare, etc."
+                      value={volunteerData.interests}
+                      onChange={(e) => handleVolunteerChange('interests', e.target.value)}
+                      className="transition-all duration-200 focus:ring-500 focus:border-blue-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="availability">Availability</Label>
+                    <Input
+                      id="availability"
+                      type="text"
+                      placeholder="e.g., Weekends, Evenings, Flexible"
+                      value={volunteerData.availability}
+                      onChange={(e) => handleVolunteerChange('availability', e.target.value)}
+                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border-0 text-lg"
+                    size="lg"
+                  >
+                    Register as Volunteer
                   </Button>
-                </div>
+                </form>
+              </TabsContent>
 
-                <div className="space-y-4">
-                  {opportunities.map((opportunity) => (
-                      <div key={opportunity.id} className="bg-white rounded-lg shadow-sm p-6">
-                        <div className="flex gap-6">
-                          <img
-                              src={opportunity.image || "/placeholder.svg"}
-                              alt={opportunity.title}
-                              className="w-64 h-32 object-cover rounded-lg flex-shrink-0"
-                          />
+              <TabsContent value="organizer" className="space-y-6">
+                <form onSubmit={handleOrganizerSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="organizationName">Organization Name *</Label>
+                    <Input
+                      id="organizationName"
+                      type="text"
+                      placeholder="Enter your organization name"
+                      value={organizerData.organizationName}
+                      onChange={(e) => handleOrganizerChange('organizationName', e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                    />
+                  </div>
 
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-xl mb-2">{opportunity.title}</h3>
-                            <p className="text-gray-600 mb-4">{opportunity.description}</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="contactPerson">Contact Person *</Label>
+                    <Input
+                      id="contactPerson"
+                      type="text"
+                      placeholder="Enter contact person name"
+                      value={organizerData.contactPerson}
+                      onChange={(e) => handleOrganizerChange('contactPerson', e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                    />
+                  </div>
 
-                            <div className="flex items-center space-x-6 mb-4">
-                              <div className="flex items-center text-sm text-gray-500">
-                                <ICONS.mapPin className="h-4 w-4 mr-1" />
-                                {opportunity.location}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <ICONS.clock className="h-4 w-4 mr-1" />
-                                {opportunity.duration}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <ICONS.calendar className="h-4 w-4 mr-1" />
-                                {opportunity.date}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <ICONS.users className="h-4 w-4 mr-1" />
-                                Total Volunteers : {opportunity.totalVolunteers} /{opportunity.maxVolunteers}
-                              </div>
-                            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="organizerEmail">Email *</Label>
+                    <Input
+                      id="organizerEmail"
+                      type="email"
+                      placeholder="Enter organization email"
+                      value={organizerData.email}
+                      onChange={(e) => handleOrganizerChange('email', e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                    />
+                  </div>
 
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <span className="text-sm font-medium">Type</span>
-                                {opportunity.types.map((type, index) => (
-                                    <Badge key={index} variant="secondary" className="text-xs">
-                                      {type}
-                                    </Badge>
-                                ))}
-                              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="organizerPassword">Password *</Label>
+                      <Input
+                        id="organizerPassword"
+                        type="password"
+                        placeholder="Create a password"
+                        value={organizerData.password}
+                        onChange={(e) => handleOrganizerChange('password', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:border-green-500 hover:border-gray-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="organizerConfirmPassword">Confirm Password *</Label>
+                      <Input
+                        id="organizerConfirmPassword"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={organizerData.confirmPassword}
+                        onChange={(e) => handleOrganizerChange('confirmPassword', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                      />
+                    </div>
+                  </div>
 
-                              <div className="flex items-center space-x-2">
-                                <Button variant="outline" size="sm">
-                                  <ICONS.info className="h-4 w-4 mr-1" />
-                                  Info
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  <ICONS.users className="h-4 w-4 mr-1" />
-                                  Volunteers
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  <ICONS.edit className="h-4 w-4 mr-1" />
-                                  Edit
-                                </Button>
-                                <Button variant="destructive" size="sm">
-                                  <ICONS.trash className="h-4 w-4 mr-1" />
-                                  Delete
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                  ))}
-                </div>
-              </div>
-          )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="Enter organization phone"
+                        value={organizerData.phone}
+                        onChange={(e) => handleOrganizerChange('phone', e.target.value)}
+                        required
+                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="organizationType">Organization Type</Label>
+                      <Input
+                        id="organizationType"
+                        type="text"
+                        placeholder="e.g., Non-profit, School, Hospital, etc."
+                        value={organizerData.organizationType}
+                        onChange={(e) => handleOrganizerChange('organizationType', e.target.value)}
+                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                      />
+                    </div>
+                  </div>
 
-          {activeTab === "application" && (
-              <div className="bg-white rounded-lg shadow-sm">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>No</TableHead>
-                      <TableHead>First name</TableHead>
-                      <TableHead>Last name</TableHead>
-                      <TableHead>Sex</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Country</TableHead>
-                      <TableHead>Phone number</TableHead>
-                      <TableHead>Volunteer Event</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {applications.map((application, index) => (
-                        <TableRow key={application.id}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{application.firstName}</TableCell>
-                          <TableCell>{application.lastName}</TableCell>
-                          <TableCell>{application.sex}</TableCell>
-                          <TableCell>{application.email}</TableCell>
-                          <TableCell>{application.country}</TableCell>
-                          <TableCell>{application.phone}</TableCell>
-                          <TableCell>{application.volunteerEvent}</TableCell>
-                        </TableRow>
-                    ))}
-                    {/* Empty rows for visual consistency */}
-                    {Array.from({ length: 8 }).map((_, index) => (
-                        <TableRow key={`empty-${index}`}>q
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>&nbsp;</TableCell>
-                        </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-          )}
-        </main>
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      type="url"
+                      placeholder="https://your-organization.com"
+                      value={organizerData.website}
+                      onChange={(e) => handleOrganizerChange('website', e.target.value)}
+                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Organization Description</Label>
+                    <textarea
+                      id="description"
+                      placeholder="Tell us about your organization and its mission..."
+                      value={organizerData.description}
+                      onChange={(e) => handleOrganizerChange('description', e.target.value)}
+                      className="min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border-0 text-lg"
+                    size="lg"
+                  >
+                    Register as Organizer
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Already have an account?{' '}
+                <a 
+                  href="/login" 
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-all duration-200 hover:underline hover:scale-105 inline-block transform"
+                >
+                  Sign in here
+                </a>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+    </div>
   )
 }
