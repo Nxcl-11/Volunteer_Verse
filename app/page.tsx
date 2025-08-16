@@ -31,28 +31,39 @@ export default function HomePage() {
               <a href="#" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
                 Contact us
               </a>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 font-medium shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 transition-all duration-200"
-              >
-                Login
-              </Button>
-              <Link href="/register">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold border-0 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200 hover:-translate-y-0.5"
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-gradient-to-r from-indigo-500 to-blue-600
+             text-white font-semibold px-6 py-2 rounded-full
+             shadow-md hover:shadow-lg
+             hover:from-indigo-600 hover:to-blue-700
+             transform hover:scale-105 active:scale-95
+             transition-all duration-200"
                 >
-                  Sign Up
+                    Login
                 </Button>
-              </Link>
+
+                {/* Sign Up Button */}
+                <Link href="/register">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-gradient-to-r from-pink-500 to-pink-600
+               text-white font-semibold px-6 py-2 rounded-full
+               shadow-md hover:shadow-lg
+               hover:from-pink-600 hover:to-pink-700
+               transform hover:scale-105 active:scale-95
+               transition-all duration-200 border-0"
+                    >
+                        Sign Up
+                    </Button>
+                </Link>
             </nav>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
       <section
         className="relative h-96 bg-cover bg-center"
         style={{
@@ -69,9 +80,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Main */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Empowering Section */}
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-12">Empowering Volunteers. Enabling Change.</h2>
 
@@ -90,9 +100,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Partners Grid */}
+            {/*  Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
-              {/* United Nations */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-sm">UN</span>
@@ -100,7 +109,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">United Nations</p>
               </div>
 
-              {/* WHO */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-sm">WHO</span>
@@ -108,7 +116,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">World Health Org</p>
               </div>
 
-              {/* Red Cross */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">RC</span>
@@ -116,7 +123,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Red Cross</p>
               </div>
 
-              {/* UNICEF */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-cyan-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">UNI</span>
@@ -124,7 +130,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">UNICEF</p>
               </div>
 
-              {/* Doctors Without Borders */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">MSF</span>
@@ -132,7 +137,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Doctors W/O Borders</p>
               </div>
 
-              {/* Habitat for Humanity */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">HFH</span>
@@ -140,7 +144,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Habitat for Humanity</p>
               </div>
 
-              {/* Oxfam */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">OXF</span>
@@ -148,7 +151,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Oxfam</p>
               </div>
 
-              {/* Save the Children */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">STC</span>
@@ -156,7 +158,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Save the Children</p>
               </div>
 
-              {/* World Wildlife Fund */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-700 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">WWF</span>
@@ -164,7 +165,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">World Wildlife Fund</p>
               </div>
 
-              {/* Amnesty International */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-yellow-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">AI</span>
@@ -172,7 +172,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Amnesty Intl</p>
               </div>
 
-              {/* Greenpeace */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">GP</span>
@@ -180,7 +179,6 @@ export default function HomePage() {
                 <p className="text-xs text-gray-600">Greenpeace</p>
               </div>
 
-              {/* Feeding America */}
               <div className="text-center">
                 <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-white font-bold text-xs">FA</span>
@@ -213,7 +211,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* How to become section */}
         <div className="text-center">
           <h3 className="text-2xl font-bold text-gray-900 mb-12">How to become one of Us</h3>
 

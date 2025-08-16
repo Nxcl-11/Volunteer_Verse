@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-// Sample data - in real app this would come from an API
 const volunteerOpportunities = [
   {
     id: 1,
@@ -65,7 +64,7 @@ export default function VolunteerDashboard() {
   const [currentTab, setCurrentTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Filter opportunities based on search
+  // Filter opportunities
   const searchResults = volunteerOpportunities.filter(opportunity =>
     opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     opportunity.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -281,7 +280,7 @@ export default function VolunteerDashboard() {
       </header>
 
       <main className="px-6 py-8 max-w-7xl mx-auto">
-        {/* Dashboard Header with Stats */}
+        {/* Dashboard Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Event Management</h1>
@@ -324,7 +323,7 @@ export default function VolunteerDashboard() {
           ))}
         </div>
 
-        {/* Search Bar */}
+        {/* Search bar */}
         <div className="relative mb-8 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
@@ -335,7 +334,7 @@ export default function VolunteerDashboard() {
           />
         </div>
 
-        {/* Tab Content */}
+        {/* Tab content */}
         {currentTab === "overview" && renderOverviewTab()}
         {currentTab === "created" && renderCreatedOpportunitiesTab()}
         {currentTab === "application" && renderApplicationsTab()}

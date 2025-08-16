@@ -1,518 +1,490 @@
 "use client"
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/hooks/use-toast"
+import { HandHeart, User as UserIcon, Building2, Heart } from "lucide-react"
 
-interface VolunteerFormData {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  confirmPassword: string
-  phone: string
-  skills: string
-  interests: string
-  availability: string
+type Sex = "Male" | "Female" | "Other" | ""
+
+interface BaseFormData {
+    firstName: string
+    lastName: string
+    sex: Sex
+    email: string
+    password: string
+    confirmPassword: string
+    country: string
+    phone: string
+    agree: boolean
 }
 
-interface OrganizerFormData {
-  organizationName: string
-  contactPerson: string
-  email: string
-  password: string
-  confirmPassword: string
-  phone: string
-  organizationType: string
-  website: string
-  description: string
+interface VolunteerFormData extends BaseFormData {}
+
+interface OrganizerFormData extends BaseFormData {
+    organizationName: string
 }
+
+const countries = [
+    "", "Cambodia", "Thailand", "Vietnam", "Laos", "Singapore", "Malaysia", "Indonesia", "Philippines", "Other",
+]
 
 export default function RegisterPage() {
-  const [activeTab, setActiveTab] = useState('volunteer')
-  const [volunteerData, setVolunteerData] = useState<VolunteerFormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    skills: '',
-    interests: '',
-    availability: ''
-  })
-  
-  const [organizerData, setOrganizerData] = useState<OrganizerFormData>({
-    organizationName: '',
-    contactPerson: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    organizationType: '',
-    website: '',
-    description: ''
-  })
+    const [activeTab, setActiveTab] = useState<"organizer" | "volunteer">("organizer")
+    const { toast } = useToast()
 
-  const { toast } = useToast()
+    const [volunteerData, setVolunteerData] = useState<VolunteerFormData>({
+        firstName: "",
+        lastName: "",
+        sex: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        country: "",
+        phone: "",
+        agree: false,
+    })
 
-  const handleVolunteerChange = (field: keyof VolunteerFormData, value: string) => {
-    setVolunteerData(prev => ({ ...prev, [field]: value }))
-  }
+    const [organizerData, setOrganizerData] = useState<OrganizerFormData>({
+        firstName: "",
+        lastName: "",
+        sex: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        country: "",
+        phone: "",
+        organizationName: "",
+        agree: false,
+    })
 
-  const handleOrganizerChange = (field: keyof OrganizerFormData, value: string) => {
-    setOrganizerData(prev => ({ ...prev, [field]: value }))
-  }
+    const onVolunteerChange = <K extends keyof VolunteerFormData>(key: K, value: VolunteerFormData[K]) =>
+        setVolunteerData((p) => ({ ...p, [key]: value }))
 
-  const validateVolunteerForm = (): boolean => {
-    if (!volunteerData.firstName || !volunteerData.lastName || !volunteerData.email || 
-        !volunteerData.password || !volunteerData.confirmPassword || !volunteerData.phone) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      })
-      return false
+    const onOrganizerChange = <K extends keyof OrganizerFormData>(key: K, value: OrganizerFormData[K]) =>
+        setOrganizerData((p) => ({ ...p, [key]: value }))
+
+    const validateBase = (data: BaseFormData) => {
+        if (
+            !data.firstName ||
+            !data.lastName ||
+            !data.sex ||
+            !data.email ||
+            !data.password ||
+            !data.confirmPassword ||
+            !data.country ||
+            !data.phone
+        ) {
+            toast({ title: "Missing information", description: "Please fill in all required fields.", variant: "destructive" })
+            return false
+        }
+        if (data.password !== data.confirmPassword) {
+            toast({ title: "Password mismatch", description: "Passwords do not match.", variant: "destructive" })
+            return false
+        }
+        if (data.password.length < 8) {
+            toast({ title: "Weak password", description: "Password must be at least 8 characters.", variant: "destructive" })
+            return false
+        }
+        if (!data.agree) {
+            toast({ title: "Terms not accepted", description: "You must agree to the terms & policy.", variant: "destructive" })
+            return false
+        }
+        return true
     }
 
-    if (volunteerData.password !== volunteerData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match.",
-        variant: "destructive"
-      })
-      return false
+    const handleVolunteerSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!validateBase(volunteerData)) return
+
+        // submit volunteerData to API here
+        console.log("Volunteer:", volunteerData)
+        toast({ title: "Registration successful", description: "Welcome to VolunteerVerse!" })
+
+        setVolunteerData({
+            firstName: "",
+            lastName: "",
+            sex: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            country: "",
+            phone: "",
+            agree: false,
+        })
     }
 
-    if (volunteerData.password.length < 8) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 8 characters long.",
-        variant: "destructive"
-      })
-      return false
+    const handleOrganizerSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!organizerData.organizationName) {
+            toast({ title: "Missing information", description: "Organization name is required.", variant: "destructive" })
+            return
+        }
+        if (!validateBase(organizerData)) return
+
+        // submit organizerData to API here
+        console.log("Organizer:", organizerData)
+        toast({ title: "Registration successful", description: "Welcome to VolunteerVerse!" })
+
+        setOrganizerData({
+            firstName: "",
+            lastName: "",
+            sex: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            country: "",
+            phone: "",
+            organizationName: "",
+            agree: false,
+        })
     }
 
-    return true
-  }
-
-  const validateOrganizerForm = (): boolean => {
-    if (!organizerData.organizationName || !organizerData.contactPerson || !organizerData.email || 
-        !organizerData.password || !organizerData.confirmPassword || !organizerData.phone) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      })
-      return false
-    }
-
-    if (organizerData.password !== organizerData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match.",
-        variant: "destructive"
-      })
-      return false
-    }
-
-    if (organizerData.password.length < 8) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 8 characters long.",
-        variant: "destructive"
-      })
-      return false
-    }
-
-    return true
-  }
-
-  const handleVolunteerSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateVolunteerForm()) return
-
-    try {
-      // Here you would typically make an API call to register the volunteer
-      console.log('Volunteer registration data:', volunteerData)
-      
-      toast({
-        title: "Registration Successful!",
-        description: "Welcome to Volunteer Verse! Please check your email to verify your account.",
-      })
-
-      // Reset form
-      setVolunteerData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        phone: '',
-        skills: '',
-        interests: '',
-        availability: ''
-      })
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      })
-    }
-  }
-
-  const handleOrganizerSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateOrganizerForm()) return
-
-    try {
-      // Here you would typically make an API call to register the organizer
-      console.log('Organizer registration data:', organizerData)
-      
-      toast({
-        title: "Registration Successful!",
-        description: "Welcome to Volunteer Verse! Please check your email to verify your account.",
-      })
-
-      // Reset form
-      setOrganizerData({
-        organizationName: '',
-        contactPerson: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        phone: '',
-        organizationType: '',
-        website: '',
-        description: ''
-      })
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      })
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Join Volunteer Verse
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Choose your role and start making a difference in your community
-          </p>
-        </div>
-
-        <Card className="w-full">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Your Account</CardTitle>
-            <CardDescription>
-              Select whether you want to volunteer or organize opportunities
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger 
-                  value="volunteer" 
-                  className="cursor-pointer flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+    const RoleCard = ({
+                          active,
+                          label,
+                          accent, // "blue" | "pink"
+                          icon,
+                          onClick,
+                      }: {
+        active: boolean
+        label: "Organizer" | "Volunteer"
+        accent: "blue" | "pink"
+        icon: React.ReactNode
+        onClick: () => void
+    }) => {
+        const isBlue = accent === "blue"
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                className={`w-40 h-40 rounded-2xl shadow-md border transition-all duration-200
+        flex flex-col items-center justify-center gap-3
+        ${active ? "bg-white" : "bg-gray-100"}
+        ${active ? "shadow-lg" : "shadow"}
+        hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]`}
+            >
+                <div
+                    className={`w-14 h-14 rounded-full flex items-center justify-center
+          ${active ? (isBlue ? "bg-blue-600" : "bg-pink-500") : "bg-gray-300"}`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  Volunteer
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="organizer" 
-                  className="cursor-pointer flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md"
+                    {icon}
+                </div>
+                <span
+                    className={`text-sm font-semibold px-3 py-1 rounded-full
+          ${active ? (isBlue ? "bg-blue-50 text-blue-700" : "bg-pink-50 text-pink-700") : "bg-gray-200 text-gray-600"}`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  Organizer
-                </TabsTrigger>
-              </TabsList>
+          {label}
+        </span>
+            </button>
+        )
+    }
 
-              <TabsContent value="volunteer" className="space-y-6">
-                <form onSubmit={handleVolunteerSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name *</Label>
-                      <Input
-                        id="firstName"
-                        type="text"
-                        placeholder="Enter your first name"
-                        value={volunteerData.firstName}
-                        onChange={(e) => handleVolunteerChange('firstName', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name *</Label>
-                      <Input
-                        id="lastName"
-                        type="text"
-                        placeholder="Enter your last name"
-                        value={volunteerData.lastName}
-                        onChange={(e) => handleVolunteerChange('lastName', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="volunteerEmail">Email *</Label>
-                    <Input
-                      id="volunteerEmail"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={volunteerData.email}
-                      onChange={(e) => handleVolunteerChange('email', e.target.value)}
-                      required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                {/* Top: Role Cards */}
+                <div className="flex items-center justify-center gap-10 mb-8">
+                    <RoleCard
+                        active={activeTab === "organizer"}
+                        label="Organizer"
+                        accent="blue"
+                        icon={<Building2 className="w-7 h-7 text-white" />}
+                        onClick={() => setActiveTab("organizer")}
                     />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="volunteerPassword">Password *</Label>
-                      <Input
-                        id="volunteerPassword"
-                        type="password"
-                        placeholder="Create a password"
-                        value={volunteerData.password}
-                        onChange={(e) => handleVolunteerChange('password', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={volunteerData.confirmPassword}
-                        onChange={(e) => handleVolunteerChange('confirmPassword', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={volunteerData.phone}
-                      onChange={(e) => handleVolunteerChange('phone', e.target.value)}
-                      required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
+                    <RoleCard
+                        active={activeTab === "volunteer"}
+                        label="Volunteer"
+                        accent="pink"
+                        icon={<HandHeart className="w-7 h-7 text-white" />}
+                        onClick={() => setActiveTab("volunteer")}
                     />
-                  </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="skills">Skills & Experience</Label>
-                    <Input
-                      id="skills"
-                      type="text"
-                      placeholder="e.g., Teaching, Construction, Medical, etc."
-                      value={volunteerData.skills}
-                      onChange={(e) => handleVolunteerChange('skills', e.target.value)}
-                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                    />
-                  </div>
+                <Card className="w-full">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl">Create your account</CardTitle>
+                        <CardDescription>Fill in the required details to register</CardDescription>
+                    </CardHeader>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="interests">Areas of Interest</Label>
-                    <Input
-                      id="interests"
-                      type="text"
-                      placeholder="e.g., Education, Environment, Healthcare, etc."
-                      value={volunteerData.interests}
-                      onChange={(e) => handleVolunteerChange('interests', e.target.value)}
-                      className="transition-all duration-200 focus:ring-500 focus:border-blue-500 hover:border-gray-400"
-                    />
-                  </div>
+                    <CardContent>
+                        {/* ORGANIZER FORM */}
+                        {activeTab === "organizer" && (
+                            <form onSubmit={handleOrganizerSubmit} className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="orgFirstName">First Name *</Label>
+                                        <Input
+                                            id="orgFirstName"
+                                            placeholder="Enter your First Name"
+                                            value={organizerData.firstName}
+                                            onChange={(e) => onOrganizerChange("firstName", e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="orgLastName">Last Name *</Label>
+                                        <Input
+                                            id="orgLastName"
+                                            placeholder="Enter your Last name"
+                                            value={organizerData.lastName}
+                                            onChange={(e) => onOrganizerChange("lastName", e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="orgSex">Sex *</Label>
+                                        <select
+                                            id="orgSex"
+                                            className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm"
+                                            value={organizerData.sex}
+                                            onChange={(e) => onOrganizerChange("sex", e.target.value as Sex)}
+                                            required
+                                        >
+                                            <option value="">Select your gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="availability">Availability</Label>
-                    <Input
-                      id="availability"
-                      type="text"
-                      placeholder="e.g., Weekends, Evenings, Flexible"
-                      value={volunteerData.availability}
-                      onChange={(e) => handleVolunteerChange('availability', e.target.value)}
-                      className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400"
-                    />
-                  </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgEmail">Email *</Label>
+                                    <Input
+                                        id="orgEmail"
+                                        type="email"
+                                        placeholder="Enter your Email"
+                                        value={organizerData.email}
+                                        onChange={(e) => onOrganizerChange("email", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border-0 text-lg"
-                    size="lg"
-                  >
-                    Register as Volunteer
-                  </Button>
-                </form>
-              </TabsContent>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgPassword">Password *</Label>
+                                    <Input
+                                        id="orgPassword"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        value={organizerData.password}
+                                        onChange={(e) => onOrganizerChange("password", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-              <TabsContent value="organizer" className="space-y-6">
-                <form onSubmit={handleOrganizerSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="organizationName">Organization Name *</Label>
-                    <Input
-                      id="organizationName"
-                      type="text"
-                      placeholder="Enter your organization name"
-                      value={organizerData.organizationName}
-                      onChange={(e) => handleOrganizerChange('organizationName', e.target.value)}
-                      required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                    />
-                  </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgConfirmPassword">Confirm password *</Label>
+                                    <Input
+                                        id="orgConfirmPassword"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        value={organizerData.confirmPassword}
+                                        onChange={(e) => onOrganizerChange("confirmPassword", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="contactPerson">Contact Person *</Label>
-                    <Input
-                      id="contactPerson"
-                      type="text"
-                      placeholder="Enter contact person name"
-                      value={organizerData.contactPerson}
-                      onChange={(e) => handleOrganizerChange('contactPerson', e.target.value)}
-                      required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                    />
-                  </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgCountry">Country *</Label>
+                                    <select
+                                        id="orgCountry"
+                                        className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm"
+                                        value={organizerData.country}
+                                        onChange={(e) => onOrganizerChange("country", e.target.value)}
+                                        required
+                                    >
+                                        {countries.map((c) => (
+                                            <option key={c} value={c}>
+                                                {c ? c : "Select your Country"}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="organizerEmail">Email *</Label>
-                    <Input
-                      id="organizerEmail"
-                      type="email"
-                      placeholder="Enter organization email"
-                      value={organizerData.email}
-                      onChange={(e) => handleOrganizerChange('email', e.target.value)}
-                      required
-                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                    />
-                  </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgPhone">Phone Number *</Label>
+                                    <Input
+                                        id="orgPhone"
+                                        type="tel"
+                                        placeholder="Enter your phone number"
+                                        value={organizerData.phone}
+                                        onChange={(e) => onOrganizerChange("phone", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="organizerPassword">Password *</Label>
-                      <Input
-                        id="organizerPassword"
-                        type="password"
-                        placeholder="Create a password"
-                        value={organizerData.password}
-                        onChange={(e) => handleOrganizerChange('password', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500  hover:border-gray-400"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="organizerConfirmPassword">Confirm Password *</Label>
-                      <Input
-                        id="organizerConfirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={organizerData.confirmPassword}
-                        onChange={(e) => handleOrganizerChange('confirmPassword', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                      />
-                    </div>
-                  </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="orgName">Organization name *</Label>
+                                    <Input
+                                        id="orgName"
+                                        placeholder="Enter your Organization name"
+                                        value={organizerData.organizationName}
+                                        onChange={(e) => onOrganizerChange("organizationName", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="Enter organization phone"
-                        value={organizerData.phone}
-                        onChange={(e) => handleOrganizerChange('phone', e.target.value)}
-                        required
-                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="organizationType">Organization Type</Label>
-                      <Input
-                        id="organizationType"
-                        type="text"
-                        placeholder="e.g., Non-profit, School, Hospital, etc."
-                        value={organizerData.organizationType}
-                        onChange={(e) => handleOrganizerChange('organizationType', e.target.value)}
-                        className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                      />
-                    </div>
-                  </div>
+                                <label className="flex items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        checked={organizerData.agree}
+                                        onChange={(e) => onOrganizerChange("agree", e.target.checked)}
+                                    />
+                                    I agree to the <a href="#" className="underline">terms & policy</a>
+                                </label>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      placeholder="https://your-organization.com"
-                      value={organizerData.website}
-                      onChange={(e) => handleOrganizerChange('website', e.target.value)}
-                      className="transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
-                    />
-                  </div>
+                                <Button
+                                    type="submit"
+                                    className="w-full h-12 bg-gray-900 hover:bg-black text-white font-medium rounded-md shadow-md"
+                                >
+                                    Agree and Register
+                                </Button>
+                            </form>
+                        )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Organization Description</Label>
-                    <textarea
-                      id="description"
-                      placeholder="Tell us about your organization and its mission..."
-                      value={organizerData.description}
-                      onChange={(e) => handleOrganizerChange('description', e.target.value)}
-                      className="min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                  </div>
+                        {/* VOLUNTEER FORM */}
+                        {activeTab === "volunteer" && (
+                            <form onSubmit={handleVolunteerSubmit} className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="volFirstName">First Name *</Label>
+                                        <Input
+                                            id="volFirstName"
+                                            placeholder="Enter your First Name"
+                                            value={volunteerData.firstName}
+                                            onChange={(e) => onVolunteerChange("firstName", e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="volLastName">Last Name *</Label>
+                                        <Input
+                                            id="volLastName"
+                                            placeholder="Enter your Last name"
+                                            value={volunteerData.lastName}
+                                            onChange={(e) => onVolunteerChange("lastName", e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="volSex">Sex *</Label>
+                                        <select
+                                            id="volSex"
+                                            className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm"
+                                            value={volunteerData.sex}
+                                            onChange={(e) => onVolunteerChange("sex", e.target.value as Sex)}
+                                            required
+                                        >
+                                            <option value="">Select your gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border-0 text-lg"
-                    size="lg"
-                  >
-                    Register as Organizer
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+                                <div className="space-y-2">
+                                    <Label htmlFor="volEmail">Email *</Label>
+                                    <Input
+                                        id="volEmail"
+                                        type="email"
+                                        placeholder="Enter your Email"
+                                        value={volunteerData.email}
+                                        onChange={(e) => onVolunteerChange("email", e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Already have an account?{' '}
-                <a 
-                  href="/login" 
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-all duration-200 hover:underline hover:scale-105 inline-block transform"
-                >
-                  Sign in here
-                </a>
-              </p>
+                                <div className="space-y-2">
+                                    <Label htmlFor="volPassword">Password *</Label>
+                                    <Input
+                                        id="volPassword"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        value={volunteerData.password}
+                                        onChange={(e) => onVolunteerChange("password", e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="volConfirmPassword">Confirm password *</Label>
+                                    <Input
+                                        id="volConfirmPassword"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        value={volunteerData.confirmPassword}
+                                        onChange={(e) => onVolunteerChange("confirmPassword", e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="volCountry">Country *</Label>
+                                    <select
+                                        id="volCountry"
+                                        className="w-full h-10 rounded-md border border-input bg-transparent px-3 text-sm"
+                                        value={volunteerData.country}
+                                        onChange={(e) => onVolunteerChange("country", e.target.value)}
+                                        required
+                                    >
+                                        {countries.map((c) => (
+                                            <option key={c} value={c}>
+                                                {c ? c : "Select your Country"}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="volPhone">Phone Number *</Label>
+                                    <Input
+                                        id="volPhone"
+                                        type="tel"
+                                        placeholder="Enter your phone number"
+                                        value={volunteerData.phone}
+                                        onChange={(e) => onVolunteerChange("phone", e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <label className="flex items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        checked={volunteerData.agree}
+                                        onChange={(e) => onVolunteerChange("agree", e.target.checked)}
+                                    />
+                                    I agree to the <a href="#" className="underline">terms & policy</a>
+                                </label>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full h-12 bg-gray-900 hover:bg-black text-white font-medium rounded-md shadow-md"
+                                >
+                                    Agree and Register
+                                </Button>
+                            </form>
+                        )}
+
+                        <div className="mt-8 text-center">
+                            <p className="text-sm text-gray-600">
+                                Already have an account?{" "}
+                                <a href="/login" className="text-blue-600 hover:text-blue-800 font-medium underline">
+                                    Sign in here
+                                </a>
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <div className="text-center text-xs text-gray-500 mt-6">
+                    © 2025 VolunteerVerse. All rights reserved.
+                </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
+        </div>
+    )
 }
