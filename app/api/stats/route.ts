@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  // Mock statistics
+  // statistics
   const stats = {
     totalVolunteers: 404,
     totalOpportunities: 3,

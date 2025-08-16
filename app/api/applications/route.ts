@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-
-// Mock database
+//Header
+// Mock data
 const applications = [
   {
     id: 1,
