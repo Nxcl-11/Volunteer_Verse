@@ -1,3 +1,5 @@
+"use client"
+
 import { Search, MapPin, Clock, Calendar, Users, Share2, Settings, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -7,6 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { useLogout } from "@/components/ui/logout"
+
 
 const volunteerOpportunities = [
   {
@@ -45,7 +49,10 @@ const volunteerOpportunities = [
 ]
 
 export default function VolunteerPage() {
-  return (
+    const handleLogout = useLogout()
+
+
+    return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
@@ -94,6 +101,7 @@ export default function VolunteerPage() {
                 variant="ghost" 
                 size="sm" 
                 className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                onClick={handleLogout}
               >
                 Logout
               </Button>

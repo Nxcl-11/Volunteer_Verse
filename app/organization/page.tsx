@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useLogout } from "@/components/ui/logout"
+
 
 const volunteerOpportunities = [
   {
@@ -63,8 +65,10 @@ const volunteerApplications = [
 export default function VolunteerDashboard() {
   const [currentTab, setCurrentTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
+  const handleLogout = useLogout()
 
-  // Filter opportunities
+
+    // Filter opportunities
   const searchResults = volunteerOpportunities.filter(opportunity =>
     opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     opportunity.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -197,7 +201,7 @@ export default function VolunteerDashboard() {
         <h2 className="text-lg font-semibold">Volunteer Applications</h2>
         <p className="text-sm text-gray-600">Review and manage volunteer applications</p>
       </div>
-      
+
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50">
@@ -238,9 +242,9 @@ export default function VolunteerDashboard() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
-              <img 
-                src="/SL-091823-63290-21.jpg" 
-                alt="VolunteerVerse Logo" 
+              <img
+                src="/SL-091823-63290-21.jpg"
+                alt="VolunteerVerse Logo"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -257,7 +261,7 @@ export default function VolunteerDashboard() {
                 1
               </span>
             </Button>
-            
+
             <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
@@ -267,13 +271,14 @@ export default function VolunteerDashboard() {
                 <div className="font-medium text-gray-900">Chylong Nou</div>
                 <div className="text-gray-500">Event Organizer</div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
-              >
-                Logout
-              </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                    onClick={handleLogout}>
+                    Logout
+                </Button>
+
             </div>
           </div>
         </div>
@@ -286,7 +291,7 @@ export default function VolunteerDashboard() {
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Event Management</h1>
             <p className="text-gray-600">Manage your volunteer opportunities and applications</p>
           </div>
-          
+
           <div className="flex gap-4">
             <div className="bg-blue-600 text-white px-6 py-4 rounded-lg flex items-center space-x-3 min-w-[160px]">
               <Users className="h-6 w-6" />

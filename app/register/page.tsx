@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { HandHeart, User as UserIcon, Building2, Heart } from "lucide-react"
+import Link from "next/link"
+
 
 type Sex = "Male" | "Female" | "Other" | ""
 
@@ -185,7 +187,18 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            {/* 🔹 Top Left Logo */}
+            <div className="px-6 pt-4">
+                <Link href="/" className="inline-flex items-center">
+                    <img
+                        src="/SL-091823-63290-21.jpg"
+                        alt="VolunteerVerse Logo"
+                        className="w-20 h-20 object-contain cursor-pointer"
+                    />
+                </Link>
+            </div>
+
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Top: Role Cards */}
                 <div className="flex items-center justify-center gap-10 mb-8">
                     <RoleCard

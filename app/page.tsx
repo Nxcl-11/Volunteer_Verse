@@ -31,19 +31,19 @@ export default function HomePage() {
               <a href="#" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
                 Contact us
               </a>
+                <Link href="/login">
                 <Button
                     variant="outline"
                     size="sm"
                     className="bg-gradient-to-r from-indigo-500 to-blue-600
-             text-white font-semibold px-6 py-2 rounded-full
-             shadow-md hover:shadow-lg
-             hover:from-indigo-600 hover:to-blue-700
-             transform hover:scale-105 active:scale-95
-             transition-all duration-200"
-                >
+                            text-white font-semibold px-6 py-2 rounded-full
+                            shadow-md hover:shadow-lg
+                            hover:from-indigo-600 hover:to-blue-700
+                            transform hover:scale-105 active:scale-95
+                            transition-all duration-200">
                     Login
                 </Button>
-
+                </Link>
                 {/* Sign Up Button */}
                 <Link href="/register">
                     <Button
