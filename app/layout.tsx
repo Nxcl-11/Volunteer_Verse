@@ -15,7 +15,6 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: 'Volunteer Verse',
-    description: 'Created with v0',
     generator: 'Volunteer ',
 }
 
