@@ -28,13 +28,14 @@ export default function RootLayout({
     return (
         <html lang="en">
         <head>
+            <title>Volunteer Verse</title>
             <style>{`
-html {
-  font-family: ${geistSans.style.fontFamily};
-  --fo nt-sans: ${geistSans.variable};
-  --font-mono: ${geistMono.variable};
-}
-        `}</style>
+                    html {
+                      font-family: ${geistSans.style.fontFamily};
+                      --fo nt-sans: ${geistSans.variable};
+                      --font-mono: ${geistMono.variable};
+                        }`}
+            </style>
         </head>
         <body>{children}</body>
         </html>

@@ -11,7 +11,9 @@ export default async function Page() {
 
     return (
         <ul>
-            {todos?.map((todo: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined) => (
+            {todos?.map((todo: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>>
+                | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string
+                | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined) => (
                 <li>{todo}</li>
             ))}
         </ul>

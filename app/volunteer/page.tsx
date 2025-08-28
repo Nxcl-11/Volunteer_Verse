@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Search, MapPin, Clock, Calendar, Users, Share2, Settings, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,7 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { useLogout } from "@/components/ui/logout"
-
+import { OpportunityDetailPopup } from "@/components/opportunity-detail-popup"
 
 const volunteerOpportunities = [
   {
@@ -49,19 +50,40 @@ const volunteerOpportunities = [
 ]
 
 export default function VolunteerPage() {
-    const handleLogout = useLogout()
+  const handleLogout = useLogout()
+  const [selectedOpportunity, setSelectedOpportunity] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
+  const handleViewDetails = async (id) => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/opportunities/${id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setSelectedOpportunity(data)
+      } else {
+        console.error("Failed to fetch opportunity details")
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching opportunity details", error)
+    }
+    setIsLoading(false)
+  }
 
-    return (
+  const handleClosePopup = () => {
+    setSelectedOpportunity(null)
+  }
+
+  return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="" className="flex items-center gap-3">
             <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
-              <img 
-                src="/SL-091823-63290-21.jpg" 
-                alt="VolunteerVerse Logo" 
+              <img
+                src="/SL-091823-63290-21.jpg"
+                alt="VolunteerVerse Logo"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -97,9 +119,9 @@ export default function VolunteerPage() {
                 <div className="font-medium">Chylong Nou</div>
                 <div className="text-gray-500 text-xs">Volunteer</div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
                 onClick={handleLogout}
               >
@@ -211,7 +233,7 @@ export default function VolunteerPage() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Button variant="outline">View</Button>
+                        <Button variant="outline" onClick={() => handleViewDetails(opportunity.id)}>View</Button>
                         <Button>Apply</Button>
                       </div>
                     </div>
@@ -222,6 +244,8 @@ export default function VolunteerPage() {
           ))}
         </div>
       </main>
+
+      <OpportunityDetailPopup opportunity={selectedOpportunity} onClose={handleClosePopup} isLoading={isLoading} />
     </div>
   )
 }

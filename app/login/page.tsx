@@ -1,40 +1,315 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Building2, HandHeart } from "lucide-react"
+import { Eye, EyeOff, Building2, HandHeart, Loader2 } from "lucide-react"
+import { createClient } from "@/utils/supabase/client"
+import { useToast } from "@/hooks/use-toast"
+import { UserRole } from "@/types/auth"
 
 type Role = "Organizer" | "Volunteer"
 
 export default function LoginPage() {
     const router = useRouter()
+    const { toast } = useToast()
+    const supabase = useMemo(() => createClient(), [])
+    
     const [role, setRole] = useState<Role>("Volunteer")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
-
+    // Users must manually log in - no automatic authentication check
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        
+        // Basic validation
+        if (!email || !password) {
+            toast({
+                title: "Missing information",
+                description: "Please fill in all required fields.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            toast({
+                title: "Invalid email",
+                description: "Please enter a valid email address.",
+                variant: "destructive",
+            })
+            return
+        }
+
         setLoading(true)
 
         try {
-            // TODO: call your auth API here
-            if (role === "Organizer") {
-                router.push("/organization")
-            } else {
-                router.push("/volunteer")
+            // Sign in with Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+
+            if (error) {
+                throw error
             }
+
+            if (data.user) {
+                // Check if email is confirmed
+                if (!data.user.email_confirmed_at) {
+                    toast({
+                        title: "Email not confirmed",
+                        description: "Please check your email and confirm your account before logging in.",
+                        variant: "destructive",
+                    })
+                    return
+                }
+                
+                // Verify the user exists and has a valid profile
+                const userRole = data.user.user_metadata?.role as UserRole
+                console.log("Login - User role from metadata:", userRole)
+                
+                if (userRole === "organizer") {
+                    // Debug: Log user information
+                    console.log("Login - Checking organizer profile for user:", {
+                        userId: data.user.id,
+                        userEmail: data.user.email,
+                        userMetadata: data.user.user_metadata
+                    })
+                    
+                    // Verify organizer profile exists in database
+                    const { data: organizerProfile, error: orgError } = await supabase
+                        .from("organizers")
+                        .select("id, first_name, last_name")
+                        .eq("user_id", data.user.id)
+                        .single()
+                    
+                    console.log("Login - Organizer profile query result:", {
+                        profile: organizerProfile,
+                        error: orgError,
+                        errorDetails: orgError ? {
+                            message: orgError.message,
+                            details: orgError.details,
+                            hint: orgError.hint,
+                            code: orgError.code
+                        } : null
+                    })
+                    
+                    if (orgError || !organizerProfile) {
+                        console.error("Organizer profile not found:", orgError)
+                        
+                        // Try to find any profiles for this user
+                        const { data: allProfiles, error: profileError } = await supabase
+                            .from("organizers")
+                            .select("id, user_id, first_name, last_name")
+                            .eq("user_id", data.user.id)
+                        
+                        console.log("Login - All organizer profiles for user:", {
+                            profiles: allProfiles,
+                            error: profileError
+                        })
+                        
+                        toast({
+                            title: "Profile not found",
+                            description: "Organizer profile not found. Please contact support.",
+                            variant: "destructive",
+                        })
+                        return
+                    }
+                    
+                    console.log("Login - Organizer profile verified:", organizerProfile)
+                    toast({
+                        title: "Login successful",
+                        description: `Welcome back, ${organizerProfile.first_name}!`,
+                    })
+                    router.push("/organization")
+                    
+                } else if (userRole === "volunteer") {
+                    // Debug: Log user information
+                    console.log("Login - Checking volunteer profile for user:", {
+                        userId: data.user.id,
+                        userEmail: data.user.email,
+                        userMetadata: data.user.user_metadata
+                    })
+                    
+                    // Verify volunteer profile exists in database
+                    const { data: volunteerProfile, error: volError } = await supabase
+                        .from("volunteers")
+                        .select("id, first_name, last_name")
+                        .eq("user_id", data.user.id)
+                        .single()
+                    
+                    console.log("Login - Volunteer profile query result:", {
+                        profile: volunteerProfile,
+                        error: volError,
+                        errorDetails: volError ? {
+                            message: volError.message,
+                            details: volError.details,
+                            hint: volError.hint,
+                            code: volError.code
+                        } : null
+                    })
+                    
+                    if (volError || !volunteerProfile) {
+                        console.error("Volunteer profile not found:", volError)
+                        
+                        // Try to find any profiles for this user
+                        const { data: allProfiles, error: profileError } = await supabase
+                            .from("volunteers")
+                            .select("id, user_id, first_name, last_name")
+                            .eq("user_id", data.user.id)
+                        
+                        console.log("Login - All volunteer profiles for user:", {
+                            profiles: allProfiles,
+                            error: profileError
+                        })
+                        
+                        toast({
+                            title: "Profile not found",
+                            description: "Volunteer profile not found. Please contact support.",
+                            variant: "destructive",
+                        })
+                        return
+                    }
+                    
+                    console.log("Login - Volunteer profile verified:", volunteerProfile)
+                    toast({
+                        title: "Login successful",
+                        description: `Welcome back, ${volunteerProfile.first_name}!`,
+                    })
+                    router.push("/volunteer")
+                    
+                } else {
+                    // No role stored in metadata - this shouldn't happen for registered users
+                    console.error("No role found in user metadata")
+                    toast({
+                        title: "Account error",
+                        description: "Your account role is not set. Please contact support.",
+                        variant: "destructive",
+                    })
+                    return
+                }
+            }
+        } catch (error: any) {
+            console.error("Login error:", error)
+            
+            // Handle specific error cases
+            let errorMessage = "Invalid email or password. Please try again."
+            if (error.message?.includes("Invalid login credentials")) {
+                errorMessage = "Invalid email or password. Please check your credentials and try again."
+            } else if (error.message?.includes("Email not confirmed")) {
+                errorMessage = "Please check your email and confirm your account before logging in."
+            } else if (error.message) {
+                errorMessage = error.message
+            }
+            
+            toast({
+                title: "Login failed",
+                description: errorMessage,
+                variant: "destructive",
+            })
         } finally {
             setLoading(false)
         }
     }
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            toast({
+                title: "Email required",
+                description: "Please enter your email address first.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/auth/reset-password`,
+            })
+
+            if (error) throw error
+
+            toast({
+                title: "Reset link sent",
+                description: "Check your email for a password reset link.",
+            })
+        } catch (error: any) {
+            toast({
+                title: "Failed to send reset link",
+                description: error?.message || "Something went wrong. Please try again.",
+                variant: "destructive",
+            })
+        }
+    }
+
+    const debugDatabase = async () => {
+        try {
+            console.log("=== DATABASE DEBUG INFO ===")
+            
+            // Check if tables exist and their structure
+            const { data: organizers, error: orgError } = await supabase
+                .from("organizers")
+                .select("*")
+                .limit(1)
+            
+            console.log("Organizers table check:", { data: organizers, error: orgError })
+            
+            const { data: volunteers, error: volError } = await supabase
+                .from("volunteers")
+                .select("*")
+                .limit(1)
+            
+            console.log("Volunteers table check:", { data: volunteers, error: volError })
+            
+            // Check current user session
+            const { data: { session } } = await supabase.auth.getSession()
+            console.log("Current session:", session)
+            
+            if (session?.user) {
+                console.log("Current user metadata:", session.user.user_metadata)
+                
+                // Try to find any profiles for current user
+                const { data: orgProfiles } = await supabase
+                    .from("organizers")
+                    .select("*")
+                    .eq("user_id", session.user.id)
+                
+                const { data: volProfiles } = await supabase
+                    .from("volunteers")
+                    .select("*")
+                    .eq("user_id", session.user.id)
+                
+                console.log("Current user profiles:", {
+                    organizers: orgProfiles,
+                    volunteers: volProfiles
+                })
+            }
+            
+            console.log("=== END DEBUG INFO ===")
+            
+            toast({
+                title: "Debug info logged",
+                description: "Check console for database structure information.",
+            })
+        } catch (error) {
+            console.error("Debug error:", error)
+            toast({
+                title: "Debug failed",
+                description: "Check console for error details.",
+                variant: "destructive",
+            })
+        }
+    }
+
+
 
     const RoleCard = ({
                           active,
@@ -76,6 +351,8 @@ export default function LoginPage() {
         )
     }
 
+    // No need for authentication checking loading state
+
     return (
         <div className="min-h-screen bg-white flex flex-col">
             {/* Logo */}
@@ -116,6 +393,11 @@ export default function LoginPage() {
                                 onClick={() => setRole("Volunteer")}
                             />
                         </div>
+                        
+                        <p className="text-xs text-gray-500 text-center mb-6">
+                            Select your role to help us personalize your experience. 
+                            Your actual role will be determined from your account.
+                        </p>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Email */}
@@ -159,12 +441,13 @@ export default function LoginPage() {
                                     </button>
                                 </div>
                                 <div className="text-right">
-                                    <Link
-                                        href="/forgot-password"
-                                        className="text-xs text-gray-600 hover:text-gray-900"
+                                    <button
+                                        type="button"
+                                        onClick={handleForgotPassword}
+                                        className="text-xs text-gray-600 hover:text-gray-900 underline underline-offset-4"
                                     >
                                         Forgot Password?
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
 
@@ -173,7 +456,14 @@ export default function LoginPage() {
                                 className="w-full h-11 bg-gray-900 hover:bg-black text-white"
                                 disabled={loading}
                             >
-                                {loading ? "Logging in..." : "Login"}
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Logging in...
+                                    </>
+                                ) : (
+                                    "Login"
+                                )}
                             </Button>
                         </form>
 
@@ -186,6 +476,17 @@ export default function LoginPage() {
                                     Create account
                                 </Link>
                             </p>
+                            
+                            {/* Debug button */}
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                <button
+                                    type="button"
+                                    onClick={debugDatabase}
+                                    className="text-xs text-blue-600 hover:text-blue-800 underline underline-offset-4"
+                                >
+                                    Debug Database (Check Console)
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
