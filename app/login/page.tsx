@@ -231,22 +231,35 @@ export default function LoginPage() {
         }
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/auth/reset-password`,
-            })
+            const response = await fetch("/auth/reset-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: email.trim() }),
+            });
 
-            if (error) throw error
+            const data = await response.json();
 
+            if (response.ok) {
+                toast({
+                    title: "Password Reset Email Sent",
+                    description: data.message,
+                });
+            } else {
+                toast({
+                    title: "Password Reset Failed",
+                    description: data.error || "Failed to send reset email. Please try again.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Password reset error:", error);
             toast({
-                title: "Reset link sent",
-                description: "Check your email for a password reset link.",
-            })
-        } catch (error: any) {
-            toast({
-                title: "Failed to send reset link",
-                description: error?.message || "Something went wrong. Please try again.",
+                title: "Password Reset Failed",
+                description: "An unexpected error occurred. Please try again.",
                 variant: "destructive",
-            })
+            });
         }
     }
 
@@ -477,16 +490,6 @@ export default function LoginPage() {
                                 </Link>
                             </p>
                             
-                            {/* Debug button */}
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                                <button
-                                    type="button"
-                                    onClick={debugDatabase}
-                                    className="text-xs text-blue-600 hover:text-blue-800 underline underline-offset-4"
-                                >
-                                    Debug Database (Check Console)
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </section>

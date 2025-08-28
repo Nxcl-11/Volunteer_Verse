@@ -54,7 +54,7 @@ export default function VolunteerPage() {
   const [selectedOpportunity, setSelectedOpportunity] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleViewDetails = async (id) => {
+  const handleViewDetails = async (id: number) => {
     setIsLoading(true)
     try {
       const response = await fetch(`/api/opportunities/${id}`)

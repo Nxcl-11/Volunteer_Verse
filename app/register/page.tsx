@@ -154,51 +154,67 @@ export default function RegisterPage() {
         setOrganizerData((p) => ({ ...p, [key]: value }));
 
     const validateBase = (data: BaseFormData) => {
+        console.log("Validating data:", data);
+        
         if (
             !data.firstName || !data.lastName || !data.sex || !data.email ||
             !data.password || !data.confirmPassword || !data.country || !data.phone
         ) {
+            console.log("Missing required fields:", {
+                firstName: !!data.firstName,
+                lastName: !!data.lastName,
+                sex: !!data.sex,
+                email: !!data.email,
+                password: !!data.password,
+                confirmPassword: !!data.confirmPassword,
+                country: !!data.country,
+                phone: !!data.phone
+            });
             toast({ title: "Missing information", description: "Please fill in all required fields.", variant: "destructive" });
             return false;
         }
         if (!/^\S+@\S+\.\S+$/.test(data.email)) {
+            console.log("Invalid email format:", data.email);
             toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
             return false;
         }
         if (data.password !== data.confirmPassword) {
+            console.log("Password mismatch");
             toast({ title: "Password mismatch", description: "Passwords do not match.", variant: "destructive" });
             return false;
         }
         if (data.password.length < 8) {
+            console.log("Password too short:", data.password.length);
             toast({ title: "Weak password", description: "Password must be at least 8 characters.", variant: "destructive" });
             return false;
         }
         if (!data.agree) {
+            console.log("Terms not agreed to");
             toast({ title: "Terms not accepted", description: "You must agree to the terms & policy.", variant: "destructive" });
             return false;
         }
+        
+        console.log("Validation passed");
         return true;
     };
 
-    /** Signup using email confirmation LINK (no OTP).
-     *  - Sends email with ConfirmationURL (must enable "Confirm email" in Supabase).
-     *  - If there is no session (typical), we stop and ask user to check inbox.
-     *  - If autoconfirm is ON and session exists, we insert profile immediately.
-     */
-    const signupWithLinkAndMaybeInsert = async (
+    const signupUser = async (
         role: "volunteer" | "organizer",
         payload: VolunteerFormData | OrganizerFormData
     ) => {
+        console.log("signupUser called with role:", role, "payload:", payload);
         setSubmitting(true);
         try {
-            const origin =
-                typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
+            const origin = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
+            console.log("Origin:", origin);
 
-            const { error: signUpError } = await supabase.auth.signUp({
+            // Sign up the user with Supabase
+            console.log("Calling supabase.auth.signUp...");
+            const { data, error: signUpError } = await supabase.auth.signUp({
                 email: payload.email,
                 password: payload.password,
                 options: {
-                    emailRedirectTo: `${origin}/auth/callback`, // add this in Supabase → URL Configuration → Redirect URLs
+                    emailRedirectTo: `${origin}/auth/callback`,
                     data: {
                         role,
                         first_name: payload.firstName,
@@ -212,148 +228,95 @@ export default function RegisterPage() {
                     },
                 },
             });
-            if (signUpError) throw signUpError;
 
-            // If confirmations are ON, there is no session now → ask user to check inbox and stop.
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
+            console.log("SignUp response:", { data, error: signUpError });
 
-            if (!session) {
+            if (signUpError) {
+                throw signUpError;
+            }
+
+            // For email confirmation flow, we don't create the profile immediately
+            // The profile will be created when the user clicks the confirmation link
+            if (data.user) {
+                console.log("User created successfully, email confirmation sent");
                 toast({
                     title: "Check your email",
                     description: "We sent a confirmation link. Click it to activate your account, then sign in.",
                 });
-                return;
-            }
-
-            // If you DO have a session (autoconfirm), insert profile now.
-            const { data: userData } = await supabase.auth.getUser();
-            const userId = userData.user?.id;
-            if (!userId) throw new Error("User ID not found.");
-
-            if (role === "volunteer") {
-                const { error } = await supabase.from("volunteers").insert({
-                    user_id: userId,
-                    first_name: payload.firstName,
-                    last_name: payload.lastName,
-                    sex: payload.sex,
-                    email: payload.email,
-                    country: payload.country,
-                    phone: payload.phone,
-                });
-                if (error) throw error;
             } else {
-                const org = payload as OrganizerFormData;
-                const { error } = await supabase.from("organizers").insert({
-                    user_id: userId,
-                    first_name: org.firstName,
-                    last_name: org.lastName,
-                    sex: org.sex,
-                    email: org.email,
-                    country: org.country,
-                    phone: org.phone,
-                    organization_name: org.organizationName,
-                });
-                if (error) throw error;
+                throw new Error("Failed to create user");
             }
 
-            toast({
-                title: "Registration successful",
-                description: "Welcome to VolunteerVerse! Redirecting to your dashboard…",
-            });
-            setTimeout(() => {
-                window.location.href = role === "organizer" ? "/organizer/dashboard" : "/volunteer/dashboard";
-            }, 600);
         } catch (err: any) {
-            toast({
-                title: "Registration failed",
-                description: err?.message ?? "Something went wrong. Please try again.",
-                variant: "destructive",
-            });
+            console.error("Registration error:", err);
+            
+            // Handle specific Supabase errors
+            if (err.message?.includes("User already registered")) {
+                toast({
+                    title: "Email already exists",
+                    description: "This email is already registered. Please try signing in instead.",
+                    variant: "destructive",
+                });
+            } else if (err.message?.includes("Password should be at least")) {
+                toast({
+                    title: "Password too weak",
+                    description: "Password must be at least 6 characters long.",
+                    variant: "destructive",
+                });
+            } else {
+                toast({
+                    title: "Registration failed",
+                    description: err?.message ?? "Something went wrong. Please try again.",
+                    variant: "destructive",
+                });
+            }
         } finally {
+            console.log("Setting submitting to false");
             setSubmitting(false);
         }
     };
 
     const handleVolunteerSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // LOG 1: Start of submission
-        console.log('--- Volunteer Submission Started ---');
-        setSubmitting(true);
-
+        console.log("Volunteer form submitted", volunteerData);
+        
+        if (!validateBase(volunteerData)) {
+            console.log("Volunteer validation failed");
+            return;
+        }
+        
+        console.log("Volunteer validation passed, calling signupUser");
         try {
-            // LOG 2: Fired before validation
-            console.log('Action: Running base validation for volunteer.');
-            if (!validateBase(volunteerData)) {
-                // LOG 3: Fired if validation fails
-                console.warn('Validation failed for volunteer data. Returning early.');
-                return; // Exits the function
-            }
-
-            // LOG 4: Fired before the signup function is called
-            console.log('Action: Volunteer data is valid. Calling signup...');
-            await signupWithLinkAndMaybeInsert("volunteer", volunteerData);
-            console.log("DATA BEING SENT for Volunteer:", volunteerData);
-
-            // LOG 5: Fired after signup function completes successfully
-            console.log('Action: Volunteer signup completed successfully.');
-
+            await signupUser("volunteer", volunteerData);
+            console.log("signupUser completed successfully");
         } catch (error) {
-            // LOG 6: Fired if any error occurs during the async process
-            console.error('An error occurred during volunteer submission:', error);
-
-        } finally {
-            // LOG 7: Fired regardless of success or failure
-            console.log('Action: Volunteer handler finished. Re-enabling button.');
-            setSubmitting(false);
-            console.log('--- Volunteer Submission Ended ---');
+            console.error("Error in handleVolunteerSubmit:", error);
         }
     };
 
     const handleOrganizerSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // LOG 8: Start of submission
-        console.log('--- Organizer Submission Started ---');
-        setSubmitting(true);
-
+        console.log("Organizer form submitted", organizerData);
+        
+        if (!organizerData.organizationName) {
+            console.log("Organization name missing");
+            toast({ title: "Missing information", description: "Organization name is required.", variant: "destructive" });
+            return;
+        }
+        
+        console.log("Organization name check passed:", organizerData.organizationName);
+        
+        if (!validateBase(organizerData)) {
+            console.log("Organizer validation failed");
+            return;
+        }
+        
+        console.log("Organizer validation passed, calling signupUser");
         try {
-            // LOG 9: Fired before organization name check
-            console.log('Action: Checking for organization name.');
-            if (!organizerData.organizationName) {
-                // LOG 10: Fired if the organization name is missing
-                console.warn('Validation failed: Organization name is missing.');
-                toast({ title: "Missing information", description: "Organization name is required.", variant: "destructive" });
-                return; // Exits the function
-            }
-
-            // LOG 11: Fired before base validation
-            console.log('Action: Running base validation for organizer.');
-            if (!validateBase(organizerData)) {
-                // LOG 12: Fired if validation fails
-                console.warn('Validation failed for organizer data. Returning early.');
-                return; // Exits the function
-            }
-
-            // LOG 13: Fired before the signup function is called
-            console.log('Action: Organizer data is valid. Calling signup...');
-            await signupWithLinkAndMaybeInsert("organizer", organizerData);
-            console.log("DATA BEING SENT for Organizer:", organizerData);
-
-            // LOG 14: Fired after signup function completes successfully
-            console.log('Action: Organizer signup completed successfully.');
-
+            await signupUser("organizer", organizerData);
+            console.log("signupUser completed successfully");
         } catch (error) {
-            // LOG 15: Fired if any error occurs during the async process
-            console.error('An error occurred during organizer submission:', error);
-
-        } finally {
-            // LOG 16: Fired regardless of success or failure
-            console.log('Action: Organizer handler finished. Re-enabling button.');
-            setSubmitting(false);
-            console.log('--- Organizer Submission Ended ---');
+            console.error("Error in handleOrganizerSubmit:", error);
         }
     };
 
@@ -524,9 +487,29 @@ export default function RegisterPage() {
                                     I agree to the <a href="#" className="underline">terms & policy</a>
                                 </label>
 
+                                {/* Test button to see if basic functionality works */}
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        console.log("Test button clicked");
+                                        console.log("Current organizer data:", organizerData);
+                                        console.log("Form validation result:", validateBase(organizerData));
+                                        
+                                        // Test toast functionality
+                                        toast({
+                                            title: "Test Toast",
+                                            description: "This is a test toast to verify the system is working.",
+                                        });
+                                    }}
+                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md"
+                                >
+                                    Test Form Data & Toast
+                                </Button>
+
                                 <Button
                                     type="submit"
                                     disabled={submitting}
+                                    onClick={() => console.log("Submit button clicked for organizer")}
                                     className="w-full h-12 bg-gray-900 hover:bg-black text-white font-medium rounded-md shadow-md disabled:opacity-60"
                                 >
                                     {submitting ? (
@@ -657,9 +640,29 @@ export default function RegisterPage() {
                                     I agree to the <a href="#" className="underline">terms & policy</a>
                                 </label>
 
+                                {/* Test button to see if basic functionality works */}
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        console.log("Test button clicked");
+                                        console.log("Current volunteer data:", volunteerData);
+                                        console.log("Form validation result:", validateBase(volunteerData));
+                                        
+                                        // Test toast functionality
+                                        toast({
+                                            title: "Test Toast",
+                                            description: "This is a test toast to verify the system is working.",
+                                        });
+                                    }}
+                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md"
+                                >
+                                    Test Form Data & Toast
+                                </Button>
+
                                 <Button
                                     type="submit"
                                     disabled={submitting}
+                                    onClick={() => console.log("Submit button clicked for volunteer")}
                                     className="w-full h-12 bg-gray-900 hover:bg-black text-white font-medium rounded-md shadow-md disabled:opacity-60"
                                 >
                                     {submitting ? (
