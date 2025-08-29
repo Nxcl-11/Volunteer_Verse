@@ -500,8 +500,8 @@ export default function LoginPage() {
                 {/* Right: Hero Image */}
                 <section className="relative hidden lg:block">
                     <Image
-                        src="/hands-globe-plant.png"
-                        alt="Welcome to VolunteerVerse"
+                        src="/earth world green.jpg"
+                        alt="Welcome to VolunteerVerse - Earth and nature background"
                         fill
                         className="object-cover"
                         priority
