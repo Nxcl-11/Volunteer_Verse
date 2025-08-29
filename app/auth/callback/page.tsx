@@ -5,6 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
+// Force dynamic rendering to prevent build issues
+export const dynamic = 'force-dynamic';
+
 export default function AuthCallback() {
     const supabase = createClient();
     const router = useRouter();
