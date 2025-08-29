@@ -12,6 +12,9 @@ import { createClient } from "@/utils/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { UserRole } from "@/types/auth"
 
+// Force dynamic rendering to prevent build issues
+export const dynamic = 'force-dynamic';
+
 type Role = "Organizer" | "Volunteer"
 
 export default function LoginPage() {

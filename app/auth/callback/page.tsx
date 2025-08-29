@@ -2,22 +2,47 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
-import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
 // Force dynamic rendering to prevent build issues
 export const dynamic = 'force-dynamic';
 
+// Prevent static generation
+export const generateStaticParams = () => [];
+
+// Route segment config to prevent static generation
+export const runtime = 'edge';
+export const preferredRegion = 'iad1';
+
 export default function AuthCallback() {
-    const supabase = createClient();
     const router = useRouter();
     const params = useSearchParams();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("Processing your confirmation...");
     const [redirecting, setRedirecting] = useState(false);
     const [debugInfo, setDebugInfo] = useState<string>("");
+    const [supabase, setSupabase] = useState<any>(null);
 
     useEffect(() => {
+        // Dynamically import Supabase client only on the client side
+        const initSupabase = async () => {
+            try {
+                const { createClient } = await import("@/utils/supabase/client");
+                setSupabase(createClient());
+            } catch (error) {
+                console.error("Failed to initialize Supabase client:", error);
+                setStatus("error");
+                setMessage("Failed to initialize authentication. Please refresh the page.");
+                return;
+            }
+        };
+
+        initSupabase();
+    }, []);
+
+    useEffect(() => {
+        if (!supabase) return; // Wait for Supabase client to be initialized
+
         const handleCallback = async () => {
             try {
                 // Debug: Log all URL parameters
