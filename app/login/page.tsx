@@ -15,14 +15,14 @@ import { UserRole } from "@/types/auth"
 // Force dynamic rendering to prevent build issues
 export const dynamic = 'force-dynamic';
 
-type Role = "Organizer" | "Volunteer"
+type Role = "organizer" | "volunteer"
 
 export default function LoginPage() {
     const router = useRouter()
     const { toast } = useToast()
     const supabase = useMemo(() => createClient(), [])
     
-    const [role, setRole] = useState<Role>("Volunteer")
+    const [role, setRole] = useState<Role>("volunteer")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
@@ -74,6 +74,13 @@ export default function LoginPage() {
                     })
                     return
                 }
+
+                console.log("Login successful - User data:", {
+                    id: data.user.id,
+                    email: data.user.email,
+                    emailConfirmed: data.user.email_confirmed_at,
+                    metadata: data.user.user_metadata
+                })
                 
                 // Verify the user exists and has a valid profile
                 const userRole = data.user.user_metadata?.role as UserRole
@@ -87,38 +94,65 @@ export default function LoginPage() {
                         userMetadata: data.user.user_metadata
                     })
                     
-                    // Verify organizer profile exists in database
-                    const { data: organizerProfile, error: orgError } = await supabase
+                    // Try to find organizer profile in database
+                    let { data: organizerProfile, error: orgError } = await supabase
                         .from("organizers")
                         .select("id, first_name, last_name")
                         .eq("user_id", data.user.id)
                         .single()
                     
-                    console.log("Login - Organizer profile query result:", {
-                        profile: organizerProfile,
-                        error: orgError,
-                        errorDetails: orgError ? {
-                            message: orgError.message,
-                            details: orgError.details,
-                            hint: orgError.hint,
-                            code: orgError.code
-                        } : null
-                    })
-                    
-                    if (orgError || !organizerProfile) {
-                        console.error("Organizer profile not found:", orgError)
+                    // If profile doesn't exist, try to create it from user metadata
+                    if (orgError && orgError.code === 'PGRST116') { // No rows returned
+                        console.log("Organizer profile not found, attempting to create from metadata")
                         
-                        // Try to find any profiles for this user
-                        const { data: allProfiles, error: profileError } = await supabase
+                        const { data: newProfile, error: createError } = await supabase
                             .from("organizers")
-                            .select("id, user_id, first_name, last_name")
-                            .eq("user_id", data.user.id)
+                            .insert({
+                                user_id: data.user.id,
+                                first_name: data.user.user_metadata.first_name,
+                                last_name: data.user.user_metadata.last_name,
+                                sex: data.user.user_metadata.sex,
+                                country: data.user.user_metadata.country,
+                                phone: data.user.user_metadata.phone,
+                                organization_name: data.user.user_metadata.organization_name,
+                                email: data.user.email
+                            })
+                            .select("id, first_name, last_name")
+                            .single()
                         
-                        console.log("Login - All organizer profiles for user:", {
-                            profiles: allProfiles,
-                            error: profileError
-                        })
+                        if (createError) {
+                            console.error("Failed to create organizer profile:", createError)
+                            toast({
+                                title: "Profile creation failed",
+                                description: "Please contact support to complete your account setup.",
+                                variant: "destructive",
+                            })
+                            return
+                        }
                         
+                        organizerProfile = newProfile
+                        console.log("Created new organizer profile:", organizerProfile)
+                    } else if (orgError) {
+                        console.error("Error checking organizer profile:", orgError)
+                        
+                        // Check if it's a table not found error
+                        if (orgError.message?.includes("relation") && orgError.message?.includes("does not exist")) {
+                            toast({
+                                title: "Database setup required",
+                                description: "The database is not properly configured. Please contact support.",
+                                variant: "destructive",
+                            })
+                        } else {
+                            toast({
+                                title: "Database error",
+                                description: "Please try again or contact support.",
+                                variant: "destructive",
+                            })
+                        }
+                        return
+                    }
+                    
+                    if (!organizerProfile) {
                         toast({
                             title: "Profile not found",
                             description: "Organizer profile not found. Please contact support.",
@@ -142,38 +176,64 @@ export default function LoginPage() {
                         userMetadata: data.user.user_metadata
                     })
                     
-                    // Verify volunteer profile exists in database
-                    const { data: volunteerProfile, error: volError } = await supabase
+                    // Try to find volunteer profile in database
+                    let { data: volunteerProfile, error: volError } = await supabase
                         .from("volunteers")
                         .select("id, first_name, last_name")
                         .eq("user_id", data.user.id)
                         .single()
                     
-                    console.log("Login - Volunteer profile query result:", {
-                        profile: volunteerProfile,
-                        error: volError,
-                        errorDetails: volError ? {
-                            message: volError.message,
-                            details: volError.details,
-                            hint: volError.hint,
-                            code: volError.code
-                        } : null
-                    })
-                    
-                    if (volError || !volunteerProfile) {
-                        console.error("Volunteer profile not found:", volError)
+                    // If profile doesn't exist, try to create it from user metadata
+                    if (volError && volError.code === 'PGRST116') { // No rows returned
+                        console.log("Volunteer profile not found, attempting to create from metadata")
                         
-                        // Try to find any profiles for this user
-                        const { data: allProfiles, error: profileError } = await supabase
+                        const { data: newProfile, error: createError } = await supabase
                             .from("volunteers")
-                            .select("id, user_id, first_name, last_name")
-                            .eq("user_id", data.user.id)
+                            .insert({
+                                user_id: data.user.id,
+                                first_name: data.user.user_metadata.first_name,
+                                last_name: data.user.user_metadata.last_name,
+                                sex: data.user.user_metadata.sex,
+                                country: data.user.user_metadata.country,
+                                phone: data.user.user_metadata.phone,
+                                email: data.user.email
+                            })
+                            .select("id, first_name, last_name")
+                            .single()
                         
-                        console.log("Login - All volunteer profiles for user:", {
-                            profiles: allProfiles,
-                            error: profileError
-                        })
+                        if (createError) {
+                            console.error("Failed to create volunteer profile:", createError)
+                            toast({
+                                title: "Profile creation failed",
+                                description: "Please contact support to complete your account setup.",
+                                variant: "destructive",
+                            })
+                            return
+                        }
                         
+                        volunteerProfile = newProfile
+                        console.log("Created new volunteer profile:", volunteerProfile)
+                    } else if (volError) {
+                        console.error("Error checking volunteer profile:", volError)
+                        
+                        // Check if it's a table not found error
+                        if (volError.message?.includes("relation") && volError.message?.includes("does not exist")) {
+                            toast({
+                                title: "Database setup required",
+                                description: "The database is not properly configured. Please contact support.",
+                                variant: "destructive",
+                            })
+                        } else {
+                            toast({
+                                title: "Database error",
+                                description: "Please try again or contact support.",
+                                variant: "destructive",
+                            })
+                        }
+                        return
+                    }
+                    
+                    if (!volunteerProfile) {
                         toast({
                             title: "Profile not found",
                             description: "Volunteer profile not found. Please contact support.",
@@ -266,64 +326,7 @@ export default function LoginPage() {
         }
     }
 
-    const debugDatabase = async () => {
-        try {
-            console.log("=== DATABASE DEBUG INFO ===")
-            
-            // Check if tables exist and their structure
-            const { data: organizers, error: orgError } = await supabase
-                .from("organizers")
-                .select("*")
-                .limit(1)
-            
-            console.log("Organizers table check:", { data: organizers, error: orgError })
-            
-            const { data: volunteers, error: volError } = await supabase
-                .from("volunteers")
-                .select("*")
-                .limit(1)
-            
-            console.log("Volunteers table check:", { data: volunteers, error: volError })
-            
-            // Check current user session
-            const { data: { session } } = await supabase.auth.getSession()
-            console.log("Current session:", session)
-            
-            if (session?.user) {
-                console.log("Current user metadata:", session.user.user_metadata)
-                
-                // Try to find any profiles for current user
-                const { data: orgProfiles } = await supabase
-                    .from("organizers")
-                    .select("*")
-                    .eq("user_id", session.user.id)
-                
-                const { data: volProfiles } = await supabase
-                    .from("volunteers")
-                    .select("*")
-                    .eq("user_id", session.user.id)
-                
-                console.log("Current user profiles:", {
-                    organizers: orgProfiles,
-                    volunteers: volProfiles
-                })
-            }
-            
-            console.log("=== END DEBUG INFO ===")
-            
-            toast({
-                title: "Debug info logged",
-                description: "Check console for database structure information.",
-            })
-        } catch (error) {
-            console.error("Debug error:", error)
-            toast({
-                title: "Debug failed",
-                description: "Check console for error details.",
-                variant: "destructive",
-            })
-        }
-    }
+
 
 
 
@@ -395,18 +398,18 @@ export default function LoginPage() {
                         {/* Role Switch (like Register page) */}
                         <div className="flex items-center justify-center gap-10 mb-8">
                             <RoleCard
-                                active={role === "Organizer"}
+                                active={role === "organizer"}
                                 label="Organizer"
                                 accent="blue"
                                 icon={<Building2 className="w-7 h-7 text-white" />}
-                                onClick={() => setRole("Organizer")}
+                                onClick={() => setRole("organizer")}
                             />
                             <RoleCard
-                                active={role === "Volunteer"}
+                                active={role === "volunteer"}
                                 label="Volunteer"
                                 accent="pink"
                                 icon={<HandHeart className="w-7 h-7 text-white" />}
-                                onClick={() => setRole("Volunteer")}
+                                onClick={() => setRole("volunteer")}
                             />
                         </div>
                         
