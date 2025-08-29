@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useLogout } from "@/components/ui/logout"
+import { useAuth } from "@/hooks/use-auth"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -673,6 +674,7 @@ export default function VolunteerDashboard() {
     const [editOpen, setEditOpen] = useState(false)
     const [editing, setEditing] = useState<UIOpportunity | null>(null)
     const handleLogout = useLogout()
+    const { user } = useAuth()
     // Info modal
     const [infoOpen, setInfoOpen] = useState(false)
     const [infoItem, setInfoItem] = useState<UIOpportunity | null>(null)
@@ -949,12 +951,22 @@ export default function VolunteerDashboard() {
                         <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                                <AvatarFallback className="bg-blue-100 text-blue-700">CN</AvatarFallback>
+                                <AvatarFallback className="bg-blue-100 text-blue-700">
+                                    {user?.user_metadata?.first_name && user?.user_metadata?.last_name
+                                        ? `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`
+                                        : user?.email?.[0]?.toUpperCase() || 'U'
+                                    }
+                                </AvatarFallback>
                             </Avatar>
-                            <div className="text-sm">
-                                <div className="font-medium text-gray-900">Chylong Nou</div>
-                                <div className="text-gray-500">Event Organizer</div>
+                                                    <div className="text-sm">
+                            <div className="font-medium text-gray-900">
+                                {user?.user_metadata?.first_name && user?.user_metadata?.last_name 
+                                    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+                                    : user?.email || 'User'
+                                }
                             </div>
+                            <div className="text-gray-500">Event Organizer</div>
+                        </div>
                             <Button
                                 variant="ghost"
                                 size="sm"
