@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('dotenv').config({ path: '.env.local' });
+
 // Simple script to check if required environment variables are set
 const requiredEnvVars = [
   'NEXT_PUBLIC_SUPABASE_URL',
