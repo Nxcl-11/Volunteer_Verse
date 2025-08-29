@@ -7,13 +7,6 @@ import { Loader2, CheckCircle, XCircle } from "lucide-react";
 // Force dynamic rendering to prevent build issues
 export const dynamic = 'force-dynamic';
 
-// Prevent static generation
-export const generateStaticParams = () => [];
-
-// Route segment config to prevent static generation
-export const runtime = 'edge';
-export const preferredRegion = 'iad1';
-
 export default function AuthCallback() {
     const router = useRouter();
     const params = useSearchParams();
@@ -53,7 +46,7 @@ export default function AuthCallback() {
                 // Check for error in URL
                 const error = params.get("error");
                 const errorDescription = params.get("error_description");
-                
+
                 if (error) {
                     console.error("Auth error:", error, errorDescription);
                     setStatus("error");
@@ -63,11 +56,11 @@ export default function AuthCallback() {
                 }
 
                 // Get the confirmation code - try multiple possible parameter names
-                const code = params.get("code") || 
-                           params.get("token_hash") || 
-                           params.get("access_token") ||
-                           params.get("refresh_token");
-                
+                const code = params.get("code") ||
+                    params.get("token_hash") ||
+                    params.get("access_token") ||
+                    params.get("refresh_token");
+
                 if (!code) {
                     console.error("No confirmation code found in URL");
                     setStatus("error");
@@ -81,11 +74,11 @@ export default function AuthCallback() {
                 // For email confirmation, we need to use a different approach
                 // Instead of exchangeCodeForSession, we'll try to get the user directly
                 // and then create the profile if needed
-                
+
                 try {
                     // First, try to get the current user session
                     const { data: { user }, error: userError } = await supabase.auth.getUser();
-                    
+
                     if (userError) {
                         console.error("User fetch error:", userError);
                         setStatus("error");
@@ -145,7 +138,7 @@ export default function AuthCallback() {
                     if (!existingVolunteer && !existingOrganizer) {
                         const metadata = user.user_metadata;
                         console.log("Creating profile for role:", userRole, "with metadata:", metadata);
-                        
+
                         if (userRole === "volunteer") {
                             const { error: profileError } = await supabase
                                 .from("volunteers")
@@ -256,7 +249,7 @@ export default function AuthCallback() {
                         <XCircle className="h-12 w-12 text-red-600" />
                         <h1 className="text-xl font-semibold text-gray-900">Confirmation Failed</h1>
                         <p className="text-gray-600 text-center max-w-md">{message}</p>
-                        
+
                         {/* Debug information for development */}
                         {process.env.NODE_ENV === "development" && debugInfo && (
                             <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-700 max-w-full overflow-auto">
@@ -264,7 +257,7 @@ export default function AuthCallback() {
                                 {debugInfo}
                             </div>
                         )}
-                        
+
                         <div className="flex gap-3 mt-4">
                             <button
                                 onClick={() => router.push("/register")}
