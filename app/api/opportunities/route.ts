@@ -17,7 +17,7 @@ type Opportunity = {
     createdAt: string
 }
 
-// --- in-memory mock DB ---
+
 const opportunities: Opportunity[] = [
     {
         id: 1,

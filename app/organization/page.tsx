@@ -355,7 +355,7 @@ function CreateOpportunityModal({
         try {
             setLoading(true)
 
-            // If you later support real image upload, upload file first and set imageUrl
+            // If you later support real image upload, upload the file first and set imageUrl
             const payload = {
                 title: form.title,
                 description: form.description,
@@ -517,7 +517,7 @@ function EditOpportunityModal({
             title: data.title,
             location: data.location,
             description: data.description,
-            startDate: /^\d{4}-\d{2}-\d{2}/.test(data.date) ? data.date : "", // if API date is formatted, leave blank
+            startDate: /^\d{4}-\d{2}-\d{2}/.test(data.date) ? data.date : "", // if the API date is formatted, leave blank
             durationDays: Number(String(data.duration).split(" ")[0]) || 1,
             maxVolunteers: data.maxVolunteers,
             categories: data.categories.join(", "),

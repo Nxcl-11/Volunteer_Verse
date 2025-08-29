@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-//Header
+
 // Mock data
 const applications = [
   {

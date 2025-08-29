@@ -65,7 +65,7 @@ export default function LoginPage() {
             }
 
             if (data.user) {
-                // Check if email is confirmed
+                // Check if the email is confirmed
                 if (!data.user.email_confirmed_at) {
                     toast({
                         title: "Email not confirmed",
@@ -94,14 +94,14 @@ export default function LoginPage() {
                         userMetadata: data.user.user_metadata
                     })
                     
-                    // Try to find organizer profile in database
+                    // Try to find the organizer profile in the database
                     let { data: organizerProfile, error: orgError } = await supabase
                         .from("organizers")
                         .select("id, first_name, last_name")
                         .eq("user_id", data.user.id)
                         .single()
                     
-                    // If profile doesn't exist, try to create it from user metadata
+                    // If the profile doesn't exist, try to create it from user metadata
                     if (orgError && orgError.code === 'PGRST116') { // No rows returned
                         console.log("Organizer profile not found, attempting to create from metadata")
                         
@@ -176,14 +176,14 @@ export default function LoginPage() {
                         userMetadata: data.user.user_metadata
                     })
                     
-                    // Try to find volunteer profile in database
+                    // Try to find the volunteer profile in the database
                     let { data: volunteerProfile, error: volError } = await supabase
                         .from("volunteers")
                         .select("id, first_name, last_name")
                         .eq("user_id", data.user.id)
                         .single()
                     
-                    // If profile doesn't exist, try to create it from user metadata
+                    // If the profile doesn't exist, try to create it from user data
                     if (volError && volError.code === 'PGRST116') { // No rows returned
                         console.log("Volunteer profile not found, attempting to create from metadata")
                         

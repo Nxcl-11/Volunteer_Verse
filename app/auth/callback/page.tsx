@@ -34,7 +34,7 @@ export default function AuthCallback() {
     }, []);
 
     useEffect(() => {
-        if (!supabase) return; // Wait for Supabase client to be initialized
+        if (!supabase) return; // Wait for Supabase client
 
         const handleCallback = async () => {
             try {
@@ -97,7 +97,7 @@ export default function AuthCallback() {
 
                     console.log("User data retrieved:", user);
 
-                    // Check if profile already exists
+                    // Check if a profile already exists
                     const userRole = user.user_metadata?.role;
                     if (!userRole) {
                         console.error("No user role found in metadata:", user.user_metadata);
@@ -134,7 +134,7 @@ export default function AuthCallback() {
 
                     console.log("Existing profiles:", { volunteer: existingVolunteer, organizer: existingOrganizer });
 
-                    // Create profile if it doesn't exist
+                    // Create a profile if it doesn't exist
                     if (!existingVolunteer && !existingOrganizer) {
                         const metadata = user.user_metadata;
                         console.log("Creating profile for role:", userRole, "with metadata:", metadata);

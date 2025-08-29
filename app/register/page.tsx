@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/utils/supabase/client";
 
-// Force dynamic rendering to prevent build issues
+// Force dynamic rendering to prevent issues
 export const dynamic = 'force-dynamic';
 
 type Sex = "Male" | "Female" | "Other" | "";
