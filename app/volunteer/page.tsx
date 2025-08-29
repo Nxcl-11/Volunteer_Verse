@@ -38,13 +38,13 @@ const volunteerOpportunities = [
   },
   {
     id: 3,
-    title: "Ressidents Elderly Volunteer",
+    title: "Residents Elderly Volunteer",
     description: "Help the elderly residents of the community",
     location: "Phnom Penh",
     duration: "3 Days",
     dateRange: "11/05/2025 - 13/05/2025",
     volunteers: { current: 20, total: 30 },
-    tags: ["Teamwork", "Gaming"],
+    tags: ["Teamwork", "Community"],
     image: "/11076533.jpg",
   },
 ]
