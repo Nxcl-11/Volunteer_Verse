@@ -490,24 +490,7 @@ export default function RegisterPage() {
                                     I agree to the <a href="#" className="underline">terms & policy</a>
                                 </label>
 
-                                {/* Test button to see if basic functionality works */}
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        console.log("Test button clicked");
-                                        console.log("Current organizer data:", organizerData);
-                                        console.log("Form validation result:", validateBase(organizerData));
-                                        
-                                        // Test toast functionality
-                                        toast({
-                                            title: "Test Toast",
-                                            description: "This is a test toast to verify the system is working.",
-                                        });
-                                    }}
-                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md"
-                                >
-                                    Test Form Data & Toast
-                                </Button>
+
 
                                 <Button
                                     type="submit"
@@ -643,24 +626,7 @@ export default function RegisterPage() {
                                     I agree to the <a href="#" className="underline">terms & policy</a>
                                 </label>
 
-                                {/* Test button to see if basic functionality works */}
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        console.log("Test button clicked");
-                                        console.log("Current volunteer data:", volunteerData);
-                                        console.log("Form validation result:", validateBase(volunteerData));
-                                        
-                                        // Test toast functionality
-                                        toast({
-                                            title: "Test Toast",
-                                            description: "This is a test toast to verify the system is working.",
-                                        });
-                                    }}
-                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md"
-                                >
-                                    Test Form Data & Toast
-                                </Button>
+
 
                                 <Button
                                     type="submit"
