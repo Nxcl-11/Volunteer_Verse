@@ -64,18 +64,46 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section
-        className="relative h-96 bg-cover bg-center"
-        style={{
-          backgroundImage: `url('/hands-globe-plant.png')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-          <div className="text-white max-w-2xl">
-            <h1 className="text-4xl font-bold leading-tight mb-4">
-              Your hands hold the power to heal the planet. Start with one good deed.
-            </h1>
+      <section className="relative h-screen min-h-[600px] overflow-hidden">
+        {/* Background Image Holder */}
+        <div className="absolute inset-0">
+          <img 
+            src="/earth world green.jpg" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover"
+          />
+          {/* Gradient Overlay for Better Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20"></div>
+        </div>
+        
+        {/* Content Overlay */}
+        <div className="relative h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="max-w-3xl">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
+                Your hands hold the power to heal the planet.
+              </h1>
+              <p className="text-xl md:text-2xl lg:text-3xl font-medium text-gray-100 leading-relaxed mb-8 drop-shadow-lg">
+                Start with one good deed.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/register">
+                  <Button className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 border-0">
+                    Get Started Today
+                  </Button>
+                </Link>
+                <Link href="#">
+          
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-bounce"></div>
           </div>
         </div>
       </section>

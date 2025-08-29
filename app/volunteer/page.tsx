@@ -23,29 +23,29 @@ const volunteerOpportunities = [
     dateRange: "11/05/2025 - 13/05/2025",
     volunteers: { current: 20, total: 30 },
     tags: ["Teamwork", "Gaming"],
-    image: "",
+    image: "/1e2cdee8-b1bc-4d0f-8c7f-d54c38ddcaec.jpg",
   },
   {
     id: 2,
-    title: "Esports Volunteer",
-    description: "Help organize the Counter Strike 2 tournament",
+    title: "Hospital Volunteer",
+    description: "Help clean the hospital",
     location: "Phnom Penh",
     duration: "3 Days",
     dateRange: "11/05/2025 - 13/05/2025",
     volunteers: { current: 20, total: 30 },
-    tags: ["Teamwork", "Gaming"],
-    image: "",
+    tags: ["Teamwork", "Labor"],
+    image: "/2302_q893_006_s_m009_c10_volunteering_flat_infographic.jpg",
   },
   {
     id: 3,
-    title: "Esports Volunteer",
-    description: "Help organize the Counter Strike 2 tournament",
+    title: "Ressidents Elderly Volunteer",
+    description: "Help the elderly residents of the community",
     location: "Phnom Penh",
     duration: "3 Days",
     dateRange: "11/05/2025 - 13/05/2025",
     volunteers: { current: 20, total: 30 },
     tags: ["Teamwork", "Gaming"],
-    image: "",
+    image: "/11076533.jpg",
   },
 ]
 
@@ -184,9 +184,9 @@ export default function VolunteerPage() {
             <Card key={opportunity.id} className="overflow-hidden bg-white">
               <CardContent className="p-0">
                 <div className="flex flex-col lg:flex-row">
-                  <div className="lg:w-80 h-48 lg:h-auto">
+                  <div className="lg:w-80 lg:h-auto overflow-hidden">
                     <img
-                      src={opportunity.image || "/placeholder.svg"}
+                      src={opportunity.image || ""}
                       alt={opportunity.title}
                       className="w-full h-full object-cover"
                     />
