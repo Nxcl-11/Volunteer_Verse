@@ -101,89 +101,54 @@ export default function HomePage() {
             </div>
 
             {/*  Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-sm">UN</span>
+            <div className="flex flex-col items-center space-y-8">
+              {/* Main Center Logo - WHO */}
+              <div className="text-center transform scale-110">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <img 
+                    src="/who-emblem.png" 
+                    alt="World Health Organization Logo" 
+                    className="w-20 h-20 object-contain"
+                  />
                 </div>
-                <p className="text-xs text-gray-600">United Nations</p>
+                <p className="text-lg font-semibold text-gray-800">World Health Organization</p>
+                <p className="text-sm text-gray-500">Leading Global Health</p>
               </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-sm">WHO</span>
+              {/* Supporting Organizations Row */}
+              <div className="flex flex-wrap justify-center items-center gap-6 max-w-4xl">
+                <div className="text-center transform hover:scale-105 transition-transform duration-200">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-md hover:shadow-lg transition-all duration-200">
+                    <img 
+                      src="/UN_emblem_blue.svg.png" 
+                      alt="United Nations Logo" 
+                      className="w-12 h-12 object-contain"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 font-medium">United Nations</p>
                 </div>
-                <p className="text-xs text-gray-600">World Health Org</p>
-              </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">RC</span>
+                <div className="text-center transform hover:scale-105 transition-transform duration-200">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-md hover:shadow-lg transition-all duration-200">
+                    <img 
+                      src="/UNICEF_Logo_(cropped).png" 
+                      alt="UNICEF Logo" 
+                      className="w-12 h-12 object-contain"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 font-medium">UNICEF</p>
                 </div>
-                <p className="text-xs text-gray-600">Red Cross</p>
-              </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-cyan-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">UNI</span>
+                <div className="text-center transform hover:scale-105 transition-transform duration-200">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-md hover:shadow-lg transition-all duration-200">
+                    <img 
+                      src="/3d345c24d0ccbc97935447d0858e4564.png" 
+                      alt="Interpol Logo" 
+                      className="w-12 h-12 object-contain"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-600 font-medium">Interpol</p>
                 </div>
-                <p className="text-xs text-gray-600">UNICEF</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">MSF</span>
-                </div>
-                <p className="text-xs text-gray-600">Doctors W/O Borders</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">HFH</span>
-                </div>
-                <p className="text-xs text-gray-600">Habitat for Humanity</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">OXF</span>
-                </div>
-                <p className="text-xs text-gray-600">Oxfam</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">STC</span>
-                </div>
-                <p className="text-xs text-gray-600">Save the Children</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">WWF</span>
-                </div>
-                <p className="text-xs text-gray-600">World Wildlife Fund</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-yellow-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">AI</span>
-                </div>
-                <p className="text-xs text-gray-600">Amnesty Intl</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">GP</span>
-                </div>
-                <p className="text-xs text-gray-600">Greenpeace</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-white font-bold text-xs">FA</span>
-                </div>
-                <p className="text-xs text-gray-600">Feeding America</p>
               </div>
             </div>
 
