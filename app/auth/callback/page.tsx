@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
-// Force dynamic rendering to prevent build issues
-export const dynamic = 'force-dynamic';
+
 
 export default function AuthCallback() {
     const router = useRouter();
